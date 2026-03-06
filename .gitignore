@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+
+# ML artifacts
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+wandb/
+mlruns/
+
+# Data
+*.parquet
+*.arrow
+*.h5
+*.hdf5
+data/raw/
+data/processed/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+*.Zone.Identifier
+
+# Jupyter
+.ipynb_checkpoints/
