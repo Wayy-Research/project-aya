@@ -1,0 +1,36 @@
+##
+## Baseline teacher evaluation configuration.
+##
+## Model: CohereForAI/aya-expanse-8b (smallest available Aya variant)
+## Benchmarks: mGSM (8-shot), XCOPA (4-shot), throughput
+## Languages: 10 diverse languages across 8 language families
+##
+## Wayy Research -- Project Aya
+##
+
+model:
+  name: "CohereForAI/aya-expanse-8b"
+  dtype: "float16"
+  device_map: "auto"
+
+benchmarks:
+  mgsm:
+    n_shot: 8
+    max_new_tokens: 256
+    languages: [en, es, hi, zh, ar, sw, tr, ja, id, te]
+  xcopa:
+    n_shot: 4
+    max_new_tokens: 16
+    languages: [en, es, hi, zh, ar, sw, tr, ja, id, te]
+  throughput:
+    n_tokens: 512
+    n_runs: 10
+    n_warmup: 2
+    languages: [en, es, hi, zh, ar, sw, tr, ja, id, te]
+
+evaluation:
+  n_bootstrap: 1000
+  confidence_level: 0.95
+  seed: 42
+
+output_dir: "results/baseline"

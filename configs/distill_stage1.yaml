@@ -1,0 +1,39 @@
+## Stage 1: Layer Alignment
+## Maps teacher (Aya-Expanse-8B) transformer layers to student
+## (Aetheris HybridMambaMoE) SSM/MoE blocks.
+##
+## Key metric: CKA similarity per layer pair.
+## Threshold: CKA >= 0.75 or investigate information loss.
+##
+## Wayy Research, 2024-2026
+
+stage: "alignment"
+
+teacher:
+  name: "CohereForAI/aya-expanse-8b"
+  dtype: "float16"
+  device_map: "auto"
+
+student:
+  config_path: "configs/student.yaml"
+  dtype: "float16"
+
+training:
+  lr: 1.0e-4
+  warmup_steps: 500
+  total_steps: 10000
+  batch_size: 4
+  max_seq_len: 512
+  gradient_accumulation: 8
+  gradient_checkpointing: true
+
+alignment:
+  loss_type: "mse+cosine"
+  cka_threshold: 0.75
+  cka_check_every: 500
+  layer_mapping: "interleaved"  # SSM<->attention on even, MoE<->FFN on odd
+
+languages: [en, es, hi, zh, ar, sw, tr, ja, id, te]
+
+output_dir: "checkpoints/stage1_alignment"
+seed: 42
