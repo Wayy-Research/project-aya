@@ -1,0 +1,72 @@
+[project]
+name = "project-aya"
+version = "0.1.0"
+description = "Distill Cohere Aya into Aetheris Mamba-MoE with multilingual equity analysis"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Wayy Research", email = "research@wayy.com"},
+]
+
+dependencies = [
+    "torch>=2.1.0",
+    "transformers>=4.40.0",
+    "datasets>=2.18.0",
+    "accelerate>=0.27.0",
+    "safetensors>=0.4.0",
+    "tokenizers>=0.15.0",
+    "pyyaml>=6.0",
+    "numpy>=1.24.0",
+    "scipy>=1.11.0",
+    "tqdm>=4.65.0",
+    "psutil>=5.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0",
+    "ipython>=8.0",
+]
+notebooks = [
+    "jupyter>=1.0",
+    "jupyterlab>=4.0",
+    "matplotlib>=3.7",
+    "seaborn>=0.12",
+    "plotly>=5.15",
+    "pandas>=2.0",
+    "ipywidgets>=8.0",
+]
+quantize = [
+    "bitsandbytes>=0.41.0",
+]
+all = [
+    "project-aya[dev,notebooks,quantize]",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["distill", "eval"]
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I", "N", "W"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"

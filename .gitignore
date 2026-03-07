@@ -44,3 +44,7 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Results (keep JSON reports, ignore images)
+results/*.png
+results/*.csv

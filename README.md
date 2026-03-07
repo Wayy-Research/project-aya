@@ -39,7 +39,7 @@ project-aya/
 ├── README.md
 ├── CONTRIBUTING.md             # Branching strategy, commit conventions, PR workflow
 ├── LICENSE                     # MIT
-├── requirements.txt            # PyTorch, Transformers, Datasets, etc.
+├── pyproject.toml              # Project config, dependencies, dev/notebooks/quantize extras
 │
 ├── eval/                       # Multilingual evaluation pipeline
 │   ├── benchmarks.py           # mGSM + XCOPA harness (few-shot, per-language)
@@ -51,6 +51,8 @@ project-aya/
 │       └── xcopa.py            # 4-shot XCOPA prompts for 10 languages
 │
 ├── distill/                    # 3-stage distillation pipeline
+│   ├── converter.py            # Core: attention→SSM and FFN→MoE weight mapping
+│   ├── block_surgery.py        # Full model conversion (all layers + embeddings)
 │   ├── alignment.py            # Stage 1: Layer alignment with CKA monitoring
 │   ├── kl_distillation.py      # Stage 2: KL divergence with temperature scaling
 │   ├── sft.py                  # Stage 3: Multilingual SFT with tool calling recovery
@@ -60,32 +62,46 @@ project-aya/
 │   └── climbmix.py             # NVIDIA ClimbMix 400B-token dataset loader
 │
 ├── configs/
-│   ├── eval_baseline.yaml      # Teacher baseline benchmark config
 │   ├── student.yaml            # Aetheris student model (1024d, 24L, 4 experts)
+│   ├── eval_baseline.yaml      # Teacher baseline benchmark config
 │   ├── distill_stage1.yaml     # Layer alignment: 10k steps, CKA threshold 0.75
 │   ├── distill_stage2.yaml     # KL distillation: 20k steps, T=2.0, alpha=0.7
 │   └── distill_climbmix.yaml   # KL distillation with ClimbMix dataset
 │
 ├── scripts/
+│   ├── run_conversion.py       # Convert Aya transformer → Aetheris Mamba-MoE
 │   ├── run_baseline.py         # Run teacher eval (mGSM + XCOPA + throughput)
 │   ├── run_distill.py          # Run distillation stages 1/2/3
-│   └── run_climbmix_distill.py # Quick-start ClimbMix distillation
+│   ├── run_climbmix_distill.py # Quick-start ClimbMix distillation
+│   ├── profile_tiny_aya.py     # Profile Aya resource usage per language
+│   └── generate_training_data.py # Generate multilingual SFT data
+│
+├── notebooks/                  # Research notebooks (run these first!)
+│   ├── 01_explore_aya_teacher.ipynb   # Load Aya, tokenizer analysis, inference profiling
+│   ├── 02_cka_analysis.ipynb          # CKA tutorial, noise sensitivity, mini-batch, heatmaps
+│   └── 03_block_conversion_experiments.ipynb  # Attention→SSM conversion on real weights
 │
 ├── docs/                       # Project documentation
+│   ├── training_data_catalog.md        # All available training data resources
 │   ├── Project Aetheris Research Guide.pdf
 │   ├── Project_Aya_Team_Doc.docx.pdf
-│   ├── Project-Aya-Research-Scope.docx
-│   ├── aetheris-presentation.html
-│   └── ...
+│   └── Project-Aya-Research-Scope.docx
 │
-├── notebooks/                  # Exploration and analysis
-├── data/                       # Data processing scripts
+├── results/                    # Output artifacts (gitignored except .json)
+├── data/                       # Generated/processed data
 └── tests/                      # Test suite
 ```
 
 ---
 
 ## Quick Start
+
+### Prerequisites
+
+- Python 3.10+
+- [uv](https://docs.astral.sh/uv/) (fast Python package manager)
+- CUDA GPU recommended (tested on RTX 3050 Ti 4GB with 4-bit quantization)
+- HuggingFace account with access to [CohereForAI/aya-expanse-8b](https://huggingface.co/CohereForAI/aya-expanse-8b) (gated model — accept license first)
 
 ### Setup
 
@@ -94,11 +110,36 @@ git clone https://github.com/Wayy-Research/project-aya.git
 cd project-aya
 
 # Create your personal branch from dev
+git checkout dev
 git checkout -b <your-name>/feature-description
 
-# Set up environment
-uv venv && source .venv/bin/activate
-uv pip install -r requirements.txt
+# Set up environment with uv
+uv venv --python 3.10
+source .venv/bin/activate
+
+# Install project (pick one):
+uv pip install -e "."              # Core only
+uv pip install -e ".[notebooks]"   # + Jupyter, matplotlib, seaborn, plotly
+uv pip install -e ".[quantize]"    # + bitsandbytes for 4-bit quantization
+uv pip install -e ".[all]"         # Everything (dev + notebooks + quantize)
+
+# Login to HuggingFace (required for gated model access)
+huggingface-cli login
+```
+
+> **Note**: If you have system-wide PyTorch with CUDA already installed, use
+> `uv venv --python 3.10 --system-site-packages` to reuse it.
+
+### Run Research Notebooks
+
+```bash
+# Start Jupyter
+jupyter lab notebooks/
+
+# Notebooks:
+# 01_explore_aya_teacher.ipynb  — Load Aya, profile tokenizer + inference per language
+# 02_cka_analysis.ipynb         — CKA tutorial: noise sensitivity, mini-batch, permutation tests
+# 03_block_conversion_experiments.ipynb — Attention→SSM conversion on real weights
 ```
 
 ### Run Teacher Baseline Evaluation
@@ -125,6 +166,30 @@ python scripts/run_climbmix_distill.py --mode retokenize
 
 # Stage 3: Supervised fine-tuning
 python scripts/run_distill.py --stage 3
+```
+
+### Model Conversion (Weight Map)
+
+Convert Aya transformer blocks directly to Aetheris Mamba-MoE:
+
+```bash
+# Direct weight mapping (no data needed, fast)
+python scripts/run_conversion.py --strategy weight_map --output checkpoints/converted/
+
+# Hybrid (weight map + refinement distillation)
+python scripts/run_conversion.py --strategy hybrid --refinement-steps 1000
+```
+
+### Profile Teacher Model
+
+```bash
+python scripts/profile_tiny_aya.py --quantize 4bit --output results/profile.json
+```
+
+### Generate Multilingual Training Data
+
+```bash
+python scripts/generate_training_data.py --quantize 4bit --output data/sft/
 ```
 
 ### Dry Run (Verify Data Loading)
