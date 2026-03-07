@@ -19,6 +19,7 @@ from distill.cka import linear_cka, rbf_cka, minibatch_cka
 from distill.alignment import LayerAlignmentTrainer
 from distill.kl_distillation import KLDistillationTrainer
 from distill.sft import SFTTrainer
+from distill.climbmix import ClimbMixConfig, ClimbMixDataset, create_climbmix_dataloader
 
 __all__ = [
     "linear_cka",
@@ -27,4 +28,7 @@ __all__ = [
     "LayerAlignmentTrainer",
     "KLDistillationTrainer",
     "SFTTrainer",
+    "ClimbMixConfig",
+    "ClimbMixDataset",
+    "create_climbmix_dataloader",
 ]
