@@ -30,14 +30,14 @@ from transformers import (
     PreTrainedTokenizerBase,
 )
 
-from eval.metrics import (
+from .metrics import (
     ConfidenceInterval,
     LanguageResult,
     aggregate_by_family,
     bootstrap_confidence_interval,
 )
-from eval.prompts.mgsm import build_mgsm_prompt, extract_mgsm_answer
-from eval.prompts.xcopa import build_xcopa_prompt, extract_xcopa_answer
+from .prompts.mgsm import build_mgsm_prompt, extract_mgsm_answer
+from .prompts.xcopa import build_xcopa_prompt, extract_xcopa_answer
 
 logger = logging.getLogger(__name__)
 

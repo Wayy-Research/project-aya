@@ -32,7 +32,7 @@ import yaml
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from distill.climbmix import ClimbMixConfig, create_climbmix_dataloader
+from aya_distill.distill.climbmix import ClimbMixConfig, create_climbmix_dataloader
 
 logging.basicConfig(
     level=logging.INFO,
@@ -141,7 +141,7 @@ def run_distillation(
     tokenizer: object | None,
 ) -> None:
     """Run KL distillation with ClimbMix data."""
-    from distill.kl_distillation import KLDistillationConfig, KLDistillationTrainer
+    from aya_distill.distill.kl_distillation import KLDistillationConfig, KLDistillationTrainer
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Device: {device}")
@@ -226,7 +226,7 @@ def main() -> None:
     # Load tokenizer if retokenize mode
     tokenizer = None
     if args.mode == "retokenize":
-        from distill.data import get_shared_tokenizer
+        from aya_distill.distill.data import get_shared_tokenizer
 
         logger.info("Loading Aya tokenizer for retokenization...")
         tokenizer = get_shared_tokenizer()

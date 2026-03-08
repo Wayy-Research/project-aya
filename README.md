@@ -16,7 +16,7 @@ Most efficient AI models are English-centric. The architecture of language techn
 
 ### Architecture: Aetheris (Hybrid Mamba-MoE)
 
-A novel student architecture combining selective state spaces with sparse mixture-of-experts, distilled from Cohere's Tiny Aya (3.35B params, 70+ languages) into Aetheris (~500-800M params, Mamba-MoE).
+A novel student architecture combining selective state spaces with sparse mixture-of-experts, distilled from Cohere's Aya Expanse (8B params, 23 languages) into Aetheris (~500-800M params, Mamba-MoE).
 
 | Component | Symbol | Description |
 |-----------|--------|-------------|
@@ -32,6 +32,26 @@ A novel student architecture combining selective state spaces with sparse mixtur
 
 ---
 
+## Package: `aya-distill`
+
+Install as a Python package for programmatic access to all distillation, evaluation, and testing tools:
+
+```python
+from aya_distill.distill.cka import linear_cka
+from aya_distill.eval.metrics import degradation_equity_score
+from aya_distill.testing import MultilingualTestSuite, ToolCallingTest
+from aya_distill.languages import LANGUAGES
+```
+
+CLI entry points:
+
+```bash
+aya-distill convert --strategy weight_map --output checkpoints/converted/
+aya-distill distill --stage 1 --config configs/distill_stage1.yaml
+aya-distill eval --config configs/eval_baseline.yaml
+aya-distill profile --quantize 4bit
+```
+
 ## Repository Structure
 
 ```
@@ -39,27 +59,38 @@ project-aya/
 ├── README.md
 ├── CONTRIBUTING.md             # Branching strategy, commit conventions, PR workflow
 ├── LICENSE                     # MIT
-├── pyproject.toml              # Project config, dependencies, dev/notebooks/quantize extras
+├── pyproject.toml              # aya-distill package config (hatchling, src-layout)
 │
-├── eval/                       # Multilingual evaluation pipeline
-│   ├── benchmarks.py           # mGSM + XCOPA harness (few-shot, per-language)
-│   ├── metrics.py              # Bootstrap CIs, Degradation Equity Score, family aggregation
-│   ├── throughput.py           # Tokens/sec, TTFT, peak memory benchmarking
-│   ├── checklist.py            # Cohere multilingual eval checklist validator (22 items)
-│   └── prompts/                # Native-language few-shot templates
-│       ├── mgsm.py             # 8-shot mGSM prompts for 10 languages
-│       └── xcopa.py            # 4-shot XCOPA prompts for 10 languages
-│
-├── distill/                    # 3-stage distillation pipeline
-│   ├── converter.py            # Core: attention→SSM and FFN→MoE weight mapping
-│   ├── block_surgery.py        # Full model conversion (all layers + embeddings)
-│   ├── alignment.py            # Stage 1: Layer alignment with CKA monitoring
-│   ├── kl_distillation.py      # Stage 2: KL divergence with temperature scaling
-│   ├── sft.py                  # Stage 3: Multilingual SFT with tool calling recovery
-│   ├── cka.py                  # CKA module (linear, RBF, mini-batch, permutation test)
-│   ├── hooks.py                # Activation extraction for teacher + student models
-│   ├── data.py                 # Language-balanced multilingual data pipeline
-│   └── climbmix.py             # NVIDIA ClimbMix 400B-token dataset loader
+├── src/aya_distill/            # pip-installable package
+│   ├── __init__.py             # Package root (version, top-level imports)
+│   ├── cli.py                  # Unified CLI: aya-distill, aya-convert, aya-eval
+│   ├── languages.py            # 10 target languages with metadata (family, script, typology)
+│   │
+│   ├── distill/                # 3-stage distillation pipeline
+│   │   ├── converter.py        # Core: attention→SSM and FFN→MoE weight mapping
+│   │   ├── block_surgery.py    # Full model conversion (all layers + embeddings)
+│   │   ├── alignment.py        # Stage 1: Layer alignment with CKA monitoring
+│   │   ├── kl_distillation.py  # Stage 2: KL divergence with temperature scaling
+│   │   ├── sft.py              # Stage 3: Multilingual SFT with tool calling recovery
+│   │   ├── cka.py              # CKA module (linear, RBF, mini-batch, permutation test)
+│   │   ├── hooks.py            # Activation extraction for teacher + student models
+│   │   ├── data.py             # Language-balanced multilingual data pipeline
+│   │   └── climbmix.py         # NVIDIA ClimbMix 400B-token dataset loader
+│   │
+│   ├── eval/                   # Multilingual evaluation pipeline
+│   │   ├── benchmarks.py       # mGSM + XCOPA harness (few-shot, per-language)
+│   │   ├── metrics.py          # Bootstrap CIs, Degradation Equity Score, family aggregation
+│   │   ├── throughput.py       # Tokens/sec, TTFT, peak memory benchmarking
+│   │   ├── checklist.py        # Cohere multilingual eval checklist validator (22 items)
+│   │   └── prompts/            # Native-language few-shot templates
+│   │       ├── mgsm.py         # 8-shot mGSM prompts for 10 languages
+│   │       └── xcopa.py        # 4-shot XCOPA prompts for 10 languages
+│   │
+│   └── testing/                # Multilingual test harness (extends testkitLLM)
+│       ├── multilingual.py     # MultilingualTestSuite — per-language quality + equity
+│       ├── tool_testing.py     # ToolCallingTest — JSON tool call verification
+│       ├── fixtures.py         # Prompts, tool schemas, scenarios in 10 languages
+│       └── conftest.py         # Pytest fixtures for model testing
 │
 ├── configs/
 │   ├── student.yaml            # Aetheris student model (1024d, 24L, 4 experts)
@@ -68,7 +99,7 @@ project-aya/
 │   ├── distill_stage2.yaml     # KL distillation: 20k steps, T=2.0, alpha=0.7
 │   └── distill_climbmix.yaml   # KL distillation with ClimbMix dataset
 │
-├── scripts/
+├── scripts/                    # Standalone scripts (can also use CLI)
 │   ├── run_conversion.py       # Convert Aya transformer → Aetheris Mamba-MoE
 │   ├── run_baseline.py         # Run teacher eval (mGSM + XCOPA + throughput)
 │   ├── run_distill.py          # Run distillation stages 1/2/3
@@ -87,9 +118,10 @@ project-aya/
 │   ├── Project_Aya_Team_Doc.docx.pdf
 │   └── Project-Aya-Research-Scope.docx
 │
+├── tests/                      # Test suite
+│   └── test_package.py         # Smoke tests for package imports, CKA, testing harness
 ├── results/                    # Output artifacts (gitignored except .json)
-├── data/                       # Generated/processed data
-└── tests/                      # Test suite
+└── data/                       # Generated/processed data
 ```
 
 ---
@@ -117,11 +149,12 @@ git checkout -b <your-name>/feature-description
 uv venv --python 3.10
 source .venv/bin/activate
 
-# Install project (pick one):
+# Install aya-distill package (pick one):
 uv pip install -e "."              # Core only
 uv pip install -e ".[notebooks]"   # + Jupyter, matplotlib, seaborn, plotly
 uv pip install -e ".[quantize]"    # + bitsandbytes for 4-bit quantization
-uv pip install -e ".[all]"         # Everything (dev + notebooks + quantize)
+uv pip install -e ".[testing]"     # + testkitLLM for multilingual semantic testing
+uv pip install -e ".[all]"         # Everything (dev + notebooks + quantize + testing)
 
 # Login to HuggingFace (required for gated model access)
 huggingface-cli login
@@ -190,6 +223,35 @@ python scripts/profile_tiny_aya.py --quantize 4bit --output results/profile.json
 
 ```bash
 python scripts/generate_training_data.py --quantize 4bit --output data/sft/
+```
+
+### Multilingual Testing
+
+Test any model's multilingual quality and tool calling ability:
+
+```python
+from aya_distill.testing import MultilingualTestSuite, ToolCallingTest
+
+# Wrap your model as a callable
+def my_model(prompt: str) -> str:
+    return model.generate(prompt)
+
+# Run quality tests across 10 languages
+suite = MultilingualTestSuite(model_fn=my_model)
+result = suite.run()
+print(result.summary())
+# Shows per-language coherence, relevance, cross-lingual consistency, equity score
+
+# Run tool calling tests
+tool_test = ToolCallingTest(model_fn=my_model)
+tool_results = tool_test.run_multilingual()
+# Tests JSON generation + function selection in all 10 languages
+```
+
+With pytest:
+
+```bash
+pytest tests/ -v
 ```
 
 ### Dry Run (Verify Data Loading)

@@ -251,7 +251,7 @@ class MultilingualDistillDataset(IterableDataset):
         self, example: dict[str, Any]
     ) -> Optional[tuple[torch.Tensor, torch.Tensor]]:
         """Prepare SFT example with assistant-only label masking."""
-        from distill.sft import format_chat, build_sft_labels
+        from .sft import format_chat, build_sft_labels
 
         if "messages" in example:
             text = format_chat(

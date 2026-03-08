@@ -30,7 +30,7 @@ import torch
 import torch.nn as nn
 import yaml
 
-from distill.converter import ConversionConfig, convert_block
+from .converter import ConversionConfig, convert_block
 
 logger = logging.getLogger(__name__)
 
@@ -193,7 +193,7 @@ def convert_model(
         student.embedding.weight.data[:copy_vocab] = teacher_embed[:copy_vocab]
     else:
         # SVD project embedding matrix
-        from distill.converter import svd_project
+        from .converter import svd_project
         projected = svd_project(teacher_embed[:copy_vocab], copy_vocab, s_dim)
         student.embedding.weight.data[:copy_vocab] = projected
 

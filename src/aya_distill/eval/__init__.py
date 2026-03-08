@@ -13,7 +13,7 @@ Usage::
 
 Wayy Research -- Project Aya
 """
-from eval.benchmarks import (
+from .benchmarks import (
     BenchmarkConfig,
     load_model_and_tokenizer,
     print_results_table,
@@ -21,8 +21,8 @@ from eval.benchmarks import (
     run_xcopa,
     save_results,
 )
-from eval.checklist import ChecklistReport, validate_results
-from eval.metrics import (
+from .checklist import ChecklistReport, validate_results
+from .metrics import (
     ConfidenceInterval,
     FamilyResult,
     LanguageResult,
@@ -31,7 +31,7 @@ from eval.metrics import (
     degradation_equity_score,
     paired_bootstrap_test,
 )
-from eval.throughput import (
+from .throughput import (
     ThroughputConfig,
     print_throughput_table,
     run_throughput_benchmark,

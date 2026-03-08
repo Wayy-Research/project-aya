@@ -431,7 +431,7 @@ def _compute_block_cka(
     is_attn: bool = True,
 ) -> float:
     """Compute CKA between a teacher block and student block on sample data."""
-    from distill.cka import linear_cka
+    from .cka import linear_cka
 
     # Get teacher output
     teacher_block.eval()

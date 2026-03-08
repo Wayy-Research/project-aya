@@ -35,8 +35,8 @@ import torch.nn.functional as F
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 
-from distill.cka import linear_cka, MinibatchCKAAccumulator
-from distill.hooks import (
+from .cka import linear_cka, MinibatchCKAAccumulator
+from .hooks import (
     ActivationStore,
     build_layer_mapping,
     register_student_hooks,

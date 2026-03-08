@@ -35,7 +35,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from eval.benchmarks import (
+from aya_distill.eval.benchmarks import (
     BenchmarkConfig,
     load_model_and_tokenizer,
     print_results_table,
@@ -43,8 +43,8 @@ from eval.benchmarks import (
     run_xcopa,
     save_results,
 )
-from eval.checklist import validate_results
-from eval.throughput import (
+from aya_distill.eval.checklist import validate_results
+from aya_distill.eval.throughput import (
     ThroughputConfig,
     print_throughput_table,
     run_throughput_benchmark,

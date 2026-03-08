@@ -57,8 +57,8 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    from distill.converter import ConversionConfig
-    from distill.block_surgery import convert_model
+    from aya_distill.distill.converter import ConversionConfig
+    from aya_distill.distill.block_surgery import convert_model
 
     config = ConversionConfig(
         strategy=args.strategy,

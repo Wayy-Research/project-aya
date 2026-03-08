@@ -1,7 +1,7 @@
 [project]
-name = "project-aya"
+name = "aya-distill"
 version = "0.1.0"
-description = "Distill Cohere Aya into Aetheris Mamba-MoE with multilingual equity analysis"
+description = "Multilingual Mamba-MoE distillation toolkit — distill Cohere Aya into Aetheris"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -44,16 +44,26 @@ notebooks = [
 quantize = [
     "bitsandbytes>=0.41.0",
 ]
-all = [
-    "project-aya[dev,notebooks,quantize]",
+testing = [
+    "testkitLLM>=0.2.0",
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
 ]
+all = [
+    "aya-distill[dev,notebooks,quantize,testing]",
+]
+
+[project.scripts]
+aya-distill = "aya_distill.cli:main"
+aya-convert = "aya_distill.cli:convert"
+aya-eval = "aya_distill.cli:evaluate"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["distill", "eval"]
+packages = ["src/aya_distill"]
 
 [tool.black]
 line-length = 88

@@ -147,8 +147,8 @@ def load_student(
 
 def run_stage1(config: dict[str, Any], device: torch.device) -> None:
     """Stage 1: Layer Alignment with CKA monitoring."""
-    from distill.alignment import AlignmentConfig, LayerAlignmentTrainer
-    from distill.data import (
+    from aya_distill.distill.alignment import AlignmentConfig, LayerAlignmentTrainer
+    from aya_distill.distill.data import (
         DistillDataConfig,
         create_distill_dataloader,
         get_shared_tokenizer,
@@ -169,7 +169,7 @@ def run_stage1(config: dict[str, Any], device: torch.device) -> None:
     student.resize_token_embeddings(len(tokenizer))
 
     # Get layer counts
-    from distill.hooks import _get_transformer_layers
+    from aya_distill.distill.hooks import _get_transformer_layers
     teacher_layers = _get_transformer_layers(teacher)
     n_teacher = len(teacher_layers) if teacher_layers else 32
     n_student = len(student.layers)
@@ -231,8 +231,8 @@ def run_stage1(config: dict[str, Any], device: torch.device) -> None:
 
 def run_stage2(config: dict[str, Any], device: torch.device) -> None:
     """Stage 2: KL Distillation with temperature scaling."""
-    from distill.kl_distillation import KLDistillationConfig, KLDistillationTrainer
-    from distill.data import (
+    from aya_distill.distill.kl_distillation import KLDistillationConfig, KLDistillationTrainer
+    from aya_distill.distill.data import (
         DistillDataConfig,
         create_distill_dataloader,
         get_shared_tokenizer,
@@ -296,8 +296,8 @@ def run_stage2(config: dict[str, Any], device: torch.device) -> None:
 
 def run_stage3(config: dict[str, Any], device: torch.device) -> None:
     """Stage 3: Supervised Fine-Tuning for capability recovery."""
-    from distill.sft import SFTConfig, SFTTrainer
-    from distill.data import (
+    from aya_distill.distill.sft import SFTConfig, SFTTrainer
+    from aya_distill.distill.data import (
         DistillDataConfig,
         create_distill_dataloader,
         get_shared_tokenizer,
