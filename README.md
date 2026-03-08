@@ -38,32 +38,26 @@ A novel student architecture combining selective state spaces with sparse mixtur
 
 ## Installation
 
-### From GitHub (recommended)
-
 ```bash
 pip install "aya-distill @ git+https://github.com/Wayy-Research/project-aya.git"
 ```
+
+That's it. One install gives you everything: evaluation, distillation, CKA analysis, multilingual testing, metrics, and the CLI.
 
 ### For development
 
 ```bash
 git clone https://github.com/Wayy-Research/project-aya.git
 cd project-aya
-
-# Create environment
 uv venv --python 3.10
 source .venv/bin/activate
-
-# Install (pick one):
-uv pip install -e "."              # Core only
-uv pip install -e ".[notebooks]"   # + Jupyter, matplotlib, seaborn, plotly
-uv pip install -e ".[quantize]"    # + bitsandbytes for 4-bit quantization
-uv pip install -e ".[testing]"     # + testkitLLM for semantic testing
-uv pip install -e ".[all]"         # Everything
+uv pip install -e "."
 ```
 
-> **Note**: If you have system-wide PyTorch with CUDA already installed, use
+> **Note**: If you have system-wide PyTorch with CUDA, use
 > `uv venv --python 3.10 --system-site-packages` to reuse it.
+> For Jupyter notebooks add `uv pip install -e ".[notebooks]"`.
+> For 4-bit quantization add `uv pip install -e ".[quantize]"`.
 
 ---
 
@@ -189,7 +183,7 @@ project-aya/
 │
 ├── src/aya_distill/            # pip-installable package
 │   ├── __init__.py             # Package root (version)
-│   ├── cli.py                  # Unified CLI: aya-distill, aya-convert, aya-eval
+│   ├── cli.py                  # Unified CLI: aya-distill
 │   ├── languages.py            # 67 target languages with metadata (family, script, typology, region, resourcedness)
 │   │
 │   ├── distill/                # 3-stage distillation pipeline

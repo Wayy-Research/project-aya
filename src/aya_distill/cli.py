@@ -8,7 +8,7 @@ import sys
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="aya-distill",
-        description="Multilingual Mamba-MoE distillation toolkit",
+        description="Multilingual evaluation and distillation toolkit — trains the Aetheris student model",
     )
     sub = parser.add_subparsers(dest="command")
 
@@ -45,7 +45,7 @@ def main() -> None:
     if args.command == "convert":
         from aya_distill.distill.block_surgery import convert_model
         convert_model(
-            teacher_name="CohereForAI/aya-expanse-8b",
+            teacher_name="CohereLabs/tiny-aya-global",
             student_config_path=args.config,
             output_dir=args.output,
         )
@@ -97,18 +97,6 @@ def main() -> None:
             cmd.extend(["--quantize", args.quantize])
         result = subprocess.run(cmd)
         sys.exit(result.returncode)
-
-
-def convert() -> None:
-    """Entry point for aya-convert."""
-    sys.argv = ["aya-distill", "convert"] + sys.argv[1:]
-    main()
-
-
-def evaluate() -> None:
-    """Entry point for aya-eval."""
-    sys.argv = ["aya-distill", "eval"] + sys.argv[1:]
-    main()
 
 
 if __name__ == "__main__":
