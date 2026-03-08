@@ -21,7 +21,17 @@ from .benchmarks import (
     run_xcopa,
     save_results,
 )
-from .checklist import ChecklistReport, validate_results
+from .checklist import (
+    CHECKLIST_ITEMS,
+    CHECKLIST_INDEX,
+    CATEGORY_NAMES,
+    ChecklistItem,
+    ChecklistReport,
+    CheckResult,
+    CheckStatus,
+    CategorySummary,
+    validate_results,
+)
 from .metrics import (
     ConfidenceInterval,
     FamilyResult,
@@ -58,6 +68,13 @@ __all__ = [
     "paired_bootstrap_test",
     "aggregate_by_family",
     # Checklist
+    "CHECKLIST_ITEMS",
+    "CHECKLIST_INDEX",
+    "CATEGORY_NAMES",
+    "ChecklistItem",
     "ChecklistReport",
+    "CheckResult",
+    "CheckStatus",
+    "CategorySummary",
     "validate_results",
 ]

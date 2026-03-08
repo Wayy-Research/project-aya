@@ -16,21 +16,12 @@ from typing import Sequence
 import numpy as np
 from numpy.typing import NDArray
 
+from aya_distill.languages import LANGUAGE_FAMILIES, LANGUAGES
+
 
 # ---------------------------------------------------------------------------
-# Language family taxonomy
+# Language family taxonomy (imported from aya_distill.languages)
 # ---------------------------------------------------------------------------
-
-LANGUAGE_FAMILIES: dict[str, list[str]] = {
-    "Indo-European": ["en", "es", "hi"],
-    "Sino-Tibetan": ["zh"],
-    "Afroasiatic": ["ar"],
-    "Niger-Congo": ["sw"],
-    "Turkic": ["tr"],
-    "Japonic": ["ja"],
-    "Austronesian": ["id"],
-    "Dravidian": ["te"],
-}
 
 LANG_TO_FAMILY: dict[str, str] = {
     lang: family
