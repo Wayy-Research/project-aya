@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Aya — Multilingual Transformer-to-Mamba Distillation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;440;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #ff0000;
+    --red-orange: #ff4207;
+    --black: #000000;
+    --red-85-1: rgba(255, 32, 32, 0.85);
+    --red-85-2: rgba(255, 17, 0, 0.85);
+    --red-85-3: rgba(207, 81, 81, 0.85);
+    --red-accent: rgba(252, 41, 9, 0.85);
+    --lime: #4bff00;
+    --orange-red: #ff2e04;
+    --black-85: rgba(0, 0, 0, 0.85);
+    --black-75: rgba(0, 0, 0, 0.75);
+    --black-60: rgba(0, 0, 0, 0.6);
+    --black-40: rgba(0, 0, 0, 0.4);
+    --black-25: rgba(0, 0, 0, 0.25);
+    --white: #ffffff;
+    --white-86: rgba(255, 255, 255, 0.86);
+    --gradient-main: linear-gradient(150deg, #ff4207, #000000);
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+  }
+
+  /* Progress bar */
+  #progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red-orange), var(--lime));
+    z-index: 1000;
+    transition: width 0.4s ease;
+  }
+
+  /* Slide counter */
+  #slide-counter {
+    position: fixed;
+    bottom: 24px;
+    right: 32px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--black-40);
+    z-index: 1000;
+    letter-spacing: 1px;
+  }
+  #slide-counter .current {
+    color: var(--white-86);
+  }
+
+  /* Slides container */
+  .slides-wrapper {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 80px;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+    overflow-y: auto;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .slide.exit-left {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  /* Radial glow */
+  .slide::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255, 66, 7, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .slide > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Typography */
+  .slide-title {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 600;
+    margin-bottom: 32px;
+    background: linear-gradient(135deg, var(--white) 40%, var(--red-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.15;
+  }
+
+  .slide-subtitle {
+    font-size: 18px;
+    color: var(--white-86);
+    font-weight: 300;
+    margin-bottom: 40px;
+    max-width: 720px;
+    line-height: 1.6;
+  }
+
+  .slide-body {
+    font-size: 20px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.7;
+    max-width: 700px;
+    margin-bottom: 40px;
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+  }
+
+  .accent { color: var(--red-orange); }
+  .lime { color: var(--lime); }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red-orange);
+    border: 1px solid rgba(255, 66, 7, 0.3);
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+
+  /* Tag pills */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 32px;
+    margin-bottom: 40px;
+  }
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 5px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--black-25);
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.03);
+  }
+
+  /* Meta row */
+  .meta-row {
+    display: flex;
+    gap: 24px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--black-40);
+    letter-spacing: 0.5px;
+  }
+  .meta-row span::before {
+    content: '';
+  }
+
+  /* Stat rows */
+  .stat-row {
+    display: flex;
+    align-items: baseline;
+    gap: 28px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-number {
+    font-family: var(--font-mono);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--red-orange);
+    min-width: 160px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .stat-desc {
+    font-size: 17px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.6;
+    max-width: 560px;
+  }
+
+  /* Blockquote */
+  .big-quote {
+    border-left: 3px solid var(--red-orange);
+    padding: 24px 0 24px 32px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 26px;
+    line-height: 1.6;
+    color: var(--white-86);
+    max-width: 800px;
+  }
+
+  /* Architecture boxes */
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+  .arch-box {
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 24px 28px;
+    background: rgba(255,255,255,0.02);
+    min-width: 240px;
+  }
+  .arch-box.student {
+    border-color: rgba(75, 255, 0, 0.25);
+    background: rgba(75, 255, 0, 0.03);
+  }
+  .arch-box .box-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black-40);
+    margin-bottom: 8px;
+  }
+  .arch-box .box-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .arch-box .box-meta {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+  }
+  .arch-arrow {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    color: var(--lime);
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  /* Pipeline steps */
+  .pipeline-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .pipeline-step {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--red-orange);
+    min-width: 24px;
+    flex-shrink: 0;
+  }
+  .step-name {
+    font-weight: 600;
+    color: var(--white);
+    min-width: 160px;
+    flex-shrink: 0;
+  }
+  .step-desc {
+    color: rgba(255,255,255,0.55);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* Component rows */
+  .component-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .component-row {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .component-row:last-child { border-bottom: none; }
+  .component-symbol {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    color: var(--lime);
+    min-width: 48px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .component-name {
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--white);
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+  .component-desc {
+    color: rgba(255,255,255,0.55);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  /* Two-column layout */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+  .col-section-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+  .col-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .col-note {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.5;
+    margin-top: 16px;
+  }
+
+  /* Code block */
+  .code-block {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 20px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    color: rgba(255,255,255,0.75);
+  }
+  .code-block .ck { color: var(--red-orange); }
+  .code-block .cs { color: var(--lime); }
+  .code-block .cv { color: rgba(255,255,255,0.9); }
+
+  /* Language table */
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .lang-row {
+    display: grid;
+    grid-template-columns: 130px 130px 100px 1fr;
+    padding: 12px 16px;
+    background: rgba(0,0,0,0.6);
+    font-size: 14px;
+    align-items: center;
+    gap: 4px;
+  }
+  .lang-row.header {
+    background: rgba(255,66,7,0.08);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--red-orange);
+  }
+  .lang-name {
+    font-weight: 600;
+    color: var(--white);
+  }
+  .lang-family { color: rgba(255,255,255,0.5); }
+  .lang-script { color: rgba(255,255,255,0.4); font-family: var(--font-mono); font-size: 13px; }
+  .lang-type { color: rgba(255,255,255,0.4); font-size: 13px; }
+
+  /* Full-width lang table */
+  .lang-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 2px;
+  }
+  .lang-table th {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--red-orange);
+    text-align: left;
+    padding: 10px 16px;
+    background: rgba(255,66,7,0.06);
+  }
+  .lang-table th:first-child { border-radius: 6px 0 0 6px; }
+  .lang-table th:last-child { border-radius: 0 6px 6px 0; }
+  .lang-table td {
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    font-size: 14px;
+  }
+  .lang-table td:first-child {
+    font-weight: 600;
+    color: var(--white);
+    border-radius: 4px 0 0 4px;
+  }
+  .lang-table td:last-child { border-radius: 0 4px 4px 0; }
+  .lang-table td:not(:first-child) { color: rgba(255,255,255,0.5); }
+
+  /* Language regions */
+  .lang-regions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 960px;
+  }
+  .lang-region {
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+  }
+  .lang-region:first-child {
+    grid-column: 1 / -1;
+  }
+  .lang-region-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white-86);
+    margin-bottom: 12px;
+  }
+  .lang-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .lc-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.6);
+    white-space: nowrap;
+  }
+
+  /* Benchmark cards */
+  .bench-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .bench-card {
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 24px;
+    background: rgba(255,255,255,0.02);
+  }
+  .bench-card-title {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .bench-card-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.55;
+  }
+
+  /* Callout */
+  .callout {
+    border: 1px solid rgba(75,255,0,0.15);
+    background: rgba(75,255,0,0.03);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  .callout-title {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--lime);
+    margin-bottom: 8px;
+  }
+  .callout-body {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.55;
+  }
+
+  /* Phase cards */
+  .phase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .phase-card {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 28px 24px;
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    flex-direction: column;
+  }
+  .phase-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--red-orange);
+    margin-bottom: 6px;
+  }
+  .phase-name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .phase-date {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--black-40);
+    margin-bottom: 16px;
+  }
+  .phase-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  /* Stack columns */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+  .stack-col-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red-orange);
+    margin-bottom: 20px;
+  }
+  .stack-item {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+  }
+  .stack-item:last-child { border-bottom: none; }
+
+  /* Closing slide */
+  .closing-center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .closing-title {
+    font-family: var(--font-display);
+    font-size: 72px;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--white) 30%, var(--red-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 20px;
+  }
+  .closing-motto {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 40px;
+  }
+  .closing-meta {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--black-40);
+    letter-spacing: 0.5px;
+    line-height: 2;
+  }
+
+  /* Title slide specific */
+  .title-main {
+    font-family: var(--font-display);
+    font-size: 80px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--white) 20%, var(--red-orange) 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .title-sub {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+
+  /* Key question highlight */
+  .key-question {
+    font-style: italic;
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .slide { padding: 40px 40px; }
+    .title-main { font-size: 56px; }
+    .slide-title { font-size: 36px; }
+    .stat-number { font-size: 36px; min-width: 120px; }
+    .two-col { grid-template-columns: 1fr; gap: 32px; }
+    .phase-grid { grid-template-columns: 1fr; }
+    .bench-grid { grid-template-columns: 1fr; }
+    .stack-grid { grid-template-columns: 1fr; gap: 32px; }
+    .lang-regions { grid-template-columns: 1fr; }
+    .lang-region:first-child { grid-column: 1; }
+    .big-quote { font-size: 22px; }
+    .arch-flow { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="slide-counter"><span class="current">1</span> / 11</div>
+
+<div class="slides-wrapper">
+
+  <!-- Slide 1: Title -->
+  <div class="slide active" data-slide="1">
+    <div class="badge">Cohere Labs &times; Wayy Research</div>
+    <div class="title-main">Project Aya</div>
+    <div class="title-sub">Compression, Equity, and the Architecture of Linguistic Inclusion</div>
+    <div class="tags">
+      <span class="tag">Multilingual</span>
+      <span class="tag">Mamba SSM</span>
+      <span class="tag">Distillation</span>
+      <span class="tag">70+ Languages</span>
+      <span class="tag">MoE</span>
+      <span class="tag">Open Source</span>
+      <span class="tag">Edge AI</span>
+    </div>
+    <div class="meta-row">
+      <span>Cohere Labs &times; Wayy Research</span>
+      <span>Buffalo, NY</span>
+      <span>Est. 2026</span>
+      <span>Open Science / Open Weights</span>
+    </div>
+  </div>
+
+  <!-- Slide 2: The Problem -->
+  <div class="slide" data-slide="2">
+    <div class="slide-title">The Problem</div>
+    <div class="slide-body">Most efficient AI models are English-centric. The architecture of language technology is leaving billions behind.</div>
+    <div>
+      <div class="stat-row">
+        <div class="stat-number">70%+</div>
+        <div class="stat-desc">of internet users are non-English speakers, yet most edge-deployed models serve English only</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-number">O(n&sup2;)</div>
+        <div class="stat-desc">Transformer attention cost makes multilingual models impractical on consumer hardware and edge devices</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-number" style="color: var(--lime)">0</div>
+        <div class="stat-desc">Multilingual Mamba large language models exist today &mdash; this gap is the opportunity</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: Research Question -->
+  <div class="slide" data-slide="3">
+    <div class="slide-title">Research Question</div>
+    <div class="big-quote">
+      Can transformer-based multilingual models be distilled into Mamba architectures while preserving multilingual capability, structured tool use, and cross-lingual reasoning &mdash; and does the compression degrade uniformly across language families?
+    </div>
+  </div>
+
+  <!-- Slide 4: Architecture -->
+  <div class="slide" data-slide="4">
+    <div class="slide-title">Teacher &rarr; Student</div>
+    <div class="arch-flow">
+      <div class="arch-box">
+        <div class="box-label">Teacher</div>
+        <div class="box-title">Tiny Aya</div>
+        <div class="box-meta">3.35B params &middot; 70+ languages</div>
+      </div>
+      <div class="arch-arrow">&rarr; distill &rarr;</div>
+      <div class="arch-box student">
+        <div class="box-label">Student</div>
+        <div class="box-title">Aetheris</div>
+        <div class="box-meta">~500&ndash;800M params &middot; Mamba-MoE</div>
+      </div>
+    </div>
+    <div style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--red-orange); margin-bottom: 16px;">3-Stage MambaInLlama Pipeline</div>
+    <div class="pipeline-steps">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">Layer Alignment</div>
+        <div class="step-desc">Map transformer attention layers to Mamba SSM blocks with structural correspondence</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">KL Distillation</div>
+        <div class="step-desc">Soft-target training with KL divergence to transfer knowledge from teacher to student</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">Supervised Fine-Tuning</div>
+        <div class="step-desc">Restore multilingual capability and structured tool calling via targeted SFT</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: Aetheris Design -->
+  <div class="slide" data-slide="5">
+    <div class="slide-title">Aetheris Architecture</div>
+    <div class="slide-subtitle">A novel student architecture combining selective state spaces with sparse mixture-of-experts</div>
+    <div class="component-rows">
+      <div class="component-row">
+        <div class="component-symbol">&Psi;</div>
+        <div class="component-name">SSM Blocks</div>
+        <div class="component-desc">O(n) selective scan with constant memory. Mamba backbone enables linear-time sequence processing.</div>
+      </div>
+      <div class="component-row">
+        <div class="component-symbol">&Sigma;</div>
+        <div class="component-name">Sparse MoE</div>
+        <div class="component-desc">4 expert FFNs with top-1 routing and load balancing. Only one expert fires per token.</div>
+      </div>
+      <div class="component-row">
+        <div class="component-symbol">&Delta;</div>
+        <div class="component-name">Hybrid Design</div>
+        <div class="component-desc">SSM blocks on odd layers, MoE on even layers. 24 total layers with weight-tied embeddings and gradient checkpointing.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: Tool Calling & Reasoning -->
+  <div class="slide" data-slide="6">
+    <div class="slide-title">Tool Use &amp; Reasoning</div>
+    <div class="two-col">
+      <div>
+        <div class="col-section-title">Structured Tool Calling</div>
+        <div class="col-desc">Structured JSON generation and function selection across 70+ languages. Nearly unstudied in multilingual settings.</div>
+        <div class="code-block">
+{<br>
+&nbsp;&nbsp;<span class="ck">"function"</span>: <span class="cs">"get_weather"</span>,<br>
+&nbsp;&nbsp;<span class="ck">"arguments"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="ck">"location"</span>: <span class="cv">"&#1575;&#1604;&#1602;&#1575;&#1607;&#1585;&#1577;"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="ck">"unit"</span>: <span class="cs">"celsius"</span><br>
+&nbsp;&nbsp;}<br>
+}
+        </div>
+        <div class="col-note">Evaluates whether the distilled model can produce valid JSON tool calls across scripts: Latin, Arabic, Devanagari, CJK, Telugu</div>
+      </div>
+      <div>
+        <div class="col-section-title">Cross-Lingual Reasoning</div>
+        <div class="col-desc">XCOPA benchmark &mdash; causal inference across 11 languages. Tests whether commonsense reasoning survives compression.</div>
+        <div class="key-question">Does distillation degrade reasoning uniformly, or do some language families lose more?</div>
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div class="col-section-title" style="font-size: 18px;">mGSM</div>
+          <div class="col-desc">Multilingual grade school math &mdash; 250 problems per language, evaluated across all supported scripts.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: Languages -->
+  <div class="slide" data-slide="7">
+    <div class="slide-title">70+ Languages, 23+ Families</div>
+    <div class="slide-subtitle">Aetheris must preserve Tiny Aya's full multilingual coverage. Distillation targets every language the teacher supports &mdash; across scripts, typologies, and resource levels.</div>
+    <div class="lang-regions">
+      <div class="lang-region">
+        <div class="lang-region-title">Europe &amp; Americas</div>
+        <div class="lang-cloud">
+          <span class="lc-tag">English</span><span class="lc-tag">French</span><span class="lc-tag">Spanish</span><span class="lc-tag">Portuguese</span><span class="lc-tag">Italian</span><span class="lc-tag">German</span><span class="lc-tag">Dutch</span><span class="lc-tag">Romanian</span><span class="lc-tag">Catalan</span><span class="lc-tag">Galician</span><span class="lc-tag">Danish</span><span class="lc-tag">Swedish</span><span class="lc-tag">Norwegian</span><span class="lc-tag">Finnish</span><span class="lc-tag">Estonian</span><span class="lc-tag">Hungarian</span><span class="lc-tag">Czech</span><span class="lc-tag">Polish</span><span class="lc-tag">Slovak</span><span class="lc-tag">Slovenian</span><span class="lc-tag">Croatian</span><span class="lc-tag">Serbian</span><span class="lc-tag">Bulgarian</span><span class="lc-tag">Ukrainian</span><span class="lc-tag">Russian</span><span class="lc-tag">Latvian</span><span class="lc-tag">Lithuanian</span><span class="lc-tag">Greek</span><span class="lc-tag">Welsh</span><span class="lc-tag">Irish</span><span class="lc-tag">Basque</span><span class="lc-tag">Maltese</span>
+        </div>
+      </div>
+      <div class="lang-region">
+        <div class="lang-region-title" style="color:var(--lime)">South &amp; Central Asia</div>
+        <div class="lang-cloud">
+          <span class="lc-tag">Hindi</span><span class="lc-tag">Bengali</span><span class="lc-tag">Marathi</span><span class="lc-tag">Gujarati</span><span class="lc-tag">Punjabi</span><span class="lc-tag">Tamil</span><span class="lc-tag">Telugu</span><span class="lc-tag">Nepali</span><span class="lc-tag">Urdu</span>
+        </div>
+      </div>
+      <div class="lang-region">
+        <div class="lang-region-title" style="color:var(--red-orange)">East &amp; Southeast Asia</div>
+        <div class="lang-cloud">
+          <span class="lc-tag">Chinese</span><span class="lc-tag">Japanese</span><span class="lc-tag">Korean</span><span class="lc-tag">Vietnamese</span><span class="lc-tag">Thai</span><span class="lc-tag">Lao</span><span class="lc-tag">Burmese</span><span class="lc-tag">Khmer</span><span class="lc-tag">Indonesian</span><span class="lc-tag">Malay</span><span class="lc-tag">Tagalog</span><span class="lc-tag">Javanese</span>
+        </div>
+      </div>
+      <div class="lang-region">
+        <div class="lang-region-title" style="color:var(--red-85-3)">West Asia &amp; North Africa</div>
+        <div class="lang-cloud">
+          <span class="lc-tag">Arabic</span><span class="lc-tag">Persian</span><span class="lc-tag">Turkish</span><span class="lc-tag">Hebrew</span>
+        </div>
+      </div>
+      <div class="lang-region">
+        <div class="lang-region-title" style="color:rgba(255,255,255,0.7)">Sub-Saharan Africa</div>
+        <div class="lang-cloud">
+          <span class="lc-tag">Swahili</span><span class="lc-tag">Amharic</span><span class="lc-tag">Hausa</span><span class="lc-tag">Igbo</span><span class="lc-tag">Yoruba</span><span class="lc-tag">Wolof</span><span class="lc-tag">Xhosa</span><span class="lc-tag">Zulu</span><span class="lc-tag">Shona</span><span class="lc-tag">Malagasy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: Benchmarks -->
+  <div class="slide" data-slide="8">
+    <div class="slide-title">Benchmark Suite</div>
+    <div class="bench-grid">
+      <div class="bench-card">
+        <div class="bench-card-title">mGSM</div>
+        <div class="bench-card-desc">Multilingual grade school math, 250 problems per language. Tests arithmetic reasoning across scripts and language families.</div>
+      </div>
+      <div class="bench-card">
+        <div class="bench-card-title">XCOPA</div>
+        <div class="bench-card-desc">Cross-lingual commonsense reasoning across 11 languages. Causal inference beyond English-centric assumptions.</div>
+      </div>
+      <div class="bench-card">
+        <div class="bench-card-title">Tool Calling</div>
+        <div class="bench-card-desc">Structured JSON generation and function selection across 70+ languages. Nearly unstudied in multilingual settings.</div>
+      </div>
+      <div class="bench-card">
+        <div class="bench-card-title">CPU Throughput</div>
+        <div class="bench-card-desc">Tokens/sec, peak memory, time-to-first-token on consumer hardware. Core practical objective.</div>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Degradation Equity Score</div>
+      <div class="callout-body">Key novel metric: the variance of accuracy drop across language families after distillation. Measures whether compression picks winners and losers. Lower is better &mdash; compression should not pick winners.</div>
+    </div>
+  </div>
+
+  <!-- Slide 9: Roadmap -->
+  <div class="slide" data-slide="9">
+    <div class="slide-title">Project Roadmap</div>
+    <div class="phase-grid">
+      <div class="phase-card">
+        <div class="phase-num">Phase 01</div>
+        <div class="phase-name">Baseline</div>
+        <div class="phase-date">Q1 2026</div>
+        <div class="phase-desc">Load Tiny Aya, establish CPU tokens/sec across language families. Validate tokenizer compatibility for all 70+ languages.</div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-num">Phase 02</div>
+        <div class="phase-name">Distillation</div>
+        <div class="phase-date">Q2 2026</div>
+        <div class="phase-desc">Execute 3-stage MambaInLlama pipeline on RunPod A100. Layer alignment, KL distillation, then multilingual SFT with tool calling recovery.</div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-num">Phase 03</div>
+        <div class="phase-name">Evaluation</div>
+        <div class="phase-date">Q3 2026</div>
+        <div class="phase-desc">Full benchmark suite across 70+ languages. Equity analysis, ablation studies, and paper targeting EMNLP / ACL / NeurIPS.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: Technology Stack -->
+  <div class="slide" data-slide="10">
+    <div class="slide-title">Technology Stack</div>
+    <div class="stack-grid">
+      <div>
+        <div class="stack-col-title">ML / Training</div>
+        <div class="stack-item">PyTorch</div>
+        <div class="stack-item">HuggingFace Transformers</div>
+        <div class="stack-item">HuggingFace Datasets</div>
+        <div class="stack-item">Mamba SSM</div>
+        <div class="stack-item">CUDA</div>
+      </div>
+      <div>
+        <div class="stack-col-title">Infrastructure</div>
+        <div class="stack-item">Docker + GitHub Actions</div>
+        <div class="stack-item">RunPod A100</div>
+        <div class="stack-item">FastAPI + SSE Streaming</div>
+        <div class="stack-item">llama.cpp (edge deployment)</div>
+        <div class="stack-item">Pydantic</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 11: Closing -->
+  <div class="slide closing-center" data-slide="11">
+    <div class="closing-title">Project Aya</div>
+    <div class="closing-motto">Open Science. Open Weights. Open Questions.</div>
+    <div class="closing-meta">
+      Cohere Labs &times; Wayy Research<br>
+      Buffalo, NY &middot; 2026<br>
+      CC-BY-NC
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  const counter = document.getElementById('slide-counter');
+  const progressBar = document.getElementById('progress-bar');
+  let current = 0;
+
+  function updateUI() {
+    counter.innerHTML = '<span class="current">' + (current + 1) + '</span> / ' + total;
+    progressBar.style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= total || index === current) return;
+    const direction = index > current ? 1 : -1;
+    const prev = slides[current];
+    const next = slides[index];
+
+    // Remove active, add exit class
+    prev.classList.remove('active');
+    if (direction === 1) {
+      prev.classList.add('exit-left');
+    }
+
+    // Set initial state for incoming slide
+    next.style.transition = 'none';
+    next.style.transform = direction === 1 ? 'translateX(40px)' : 'translateX(-40px)';
+    next.style.opacity = '0';
+
+    // Force reflow
+    void next.offsetWidth;
+
+    // Animate in
+    next.style.transition = '';
+    next.classList.add('active');
+    next.style.transform = '';
+    next.style.opacity = '';
+
+    // Clean up after transition
+    setTimeout(function() {
+      prev.classList.remove('exit-left');
+      prev.style.transform = '';
+      prev.style.opacity = '';
+    }, 500);
+
+    current = index;
+    updateUI();
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); prev(); }
+  });
+
+  document.addEventListener('click', function(e) {
+    // Don't advance on text selection
+    if (window.getSelection().toString().length > 0) return;
+    next();
+  });
+
+  updateUI();
+})();
+</script>
+
+</body>
+</html>

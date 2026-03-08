@@ -1,0 +1,31 @@
+## Aetheris Student Model Configuration
+## Target: ~500-800M parameters (HybridMambaMoE)
+##
+## Architecture: 24 layers alternating SSM (even) and MoE (odd)
+## Vocab sized to match Aya tokenizer (256k)
+##
+## Wayy Research, 2024-2026
+
+vocab_size: 256000
+d_model: 1024
+n_layer: 24
+num_experts: 4
+top_k: 1
+d_ff: 3072  # d_model * 3
+
+# SSM parameters
+ssm_d_state: 16
+ssm_expand: 2
+# d_inner: null  # defaults to d_model * ssm_expand = 2048
+
+# Training parameters
+load_balancing_coef: 0.01
+router_z_loss_coef: 0.001
+max_seq_len: 2048
+dtype: "float16"
+
+# Optimization
+use_cpu_offload: false
+gradient_checkpointing: true
+checkpoint_ssm_layers: true
+use_flash_attention: false

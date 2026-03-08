@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Aya — Research Scope | Cohere Labs × Wayy Research</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================
+       PROJECT AYA — RESEARCH SCOPE DOCUMENT
+       Cohere Labs × Wayy Research, 2026
+       ========================================= */
+
+    :root {
+      /* Cohere brand: deep green/teal + coral */
+      --cohere-green:     #39594D;
+      --cohere-green-light:#4a7a68;
+      --cohere-coral:     #D18EE2;
+      --cohere-sand:      #F5F0EB;
+
+      /* Wayy brand: indigo */
+      --wayy-indigo:      #5b6abf;
+      --wayy-indigo-soft: #e8eaf6;
+
+      /* Shared palette */
+      --color-ink:        #1a1a1a;
+      --color-ink-light:  #3d3d3d;
+      --color-ink-muted:  #6b6b7a;
+      --color-accent:     var(--cohere-green);
+      --color-accent-soft:#e8f0ec;
+      --color-accent-mid: #b8d4c6;
+      --color-secondary:  var(--wayy-indigo);
+      --color-secondary-soft: var(--wayy-indigo-soft);
+      --color-warm:       #c75a3a;
+      --color-warm-soft:  #fdf0ec;
+      --color-bg:         #ffffff;
+      --color-bg-subtle:  #f9faf9;
+      --color-border:     #dde3df;
+      --color-border-light:#edf0ee;
+      --font-body:        'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-heading:     'Playfair Display', Georgia, 'Times New Roman', serif;
+      --font-mono:        'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+      --max-width:        750px;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--color-ink);
+      background: var(--color-bg);
+      line-height: 1.7;
+      padding: 0;
+    }
+
+    /* Page Container */
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 3rem 2rem 4rem;
+    }
+
+    /* ---- COLLABORATION BANNER ---- */
+    .collab-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2.5rem;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--cohere-green) 0%, #2d4a3f 50%, #1e2a4a 100%);
+      color: white;
+    }
+
+    .collab-org {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .collab-org-name {
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+    }
+
+    .collab-org-sub {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .collab-x {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 1.5rem;
+      color: rgba(255,255,255,0.35);
+      padding: 0 0.25rem;
+    }
+
+    .collab-badge {
+      display: block;
+      margin-top: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      text-align: center;
+    }
+
+    /* ---- HEADER ---- */
+    .document-header {
+      border-bottom: 2px solid var(--color-ink);
+      padding-bottom: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.25rem;
+    }
+
+    .header-orgs {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .org-name {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .org-cohere { color: var(--cohere-green); }
+    .org-wayy { color: var(--wayy-indigo); }
+
+    .org-divider {
+      font-size: 0.7rem;
+      color: var(--color-ink-muted);
+      font-weight: 300;
+    }
+
+    .doc-type {
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-ink-muted);
+    }
+
+    .project-title {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 2.75rem;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-top: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .project-subtitle {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 1.15rem;
+      color: var(--color-ink-light);
+      line-height: 1.5;
+      max-width: 620px;
+    }
+
+    .header-meta {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      font-size: 0.8rem;
+      color: var(--color-ink-muted);
+    }
+
+    .meta-item strong {
+      color: var(--color-ink-light);
+      font-weight: 600;
+    }
+
+    /* ---- SECTIONS ---- */
+    .section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-label {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cohere-green);
+      margin-bottom: 0.4rem;
+    }
+
+    .section h2 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--color-ink);
+      line-height: 1.3;
+      margin-bottom: 1rem;
+    }
+
+    .section h3 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--color-ink);
+      margin-top: 1.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .section p {
+      margin-bottom: 0.85rem;
+      color: var(--color-ink-light);
+    }
+
+    /* ---- RESEARCH QUESTION (featured) ---- */
+    .research-question {
+      background: var(--color-bg-subtle);
+      border-left: 4px solid var(--cohere-green);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 2.5rem;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .research-question p {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-size: 1.1rem;
+      line-height: 1.65;
+      color: var(--color-ink);
+      margin: 0;
+    }
+
+    /* ---- LISTS ---- */
+    .section ul, .section ol {
+      padding-left: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .section ul li, .section ol li {
+      margin-bottom: 0.5rem;
+      color: var(--color-ink-light);
+      line-height: 1.6;
+    }
+
+    .section ul li::marker {
+      color: var(--cohere-green);
+    }
+
+    .section ol li::marker {
+      color: var(--cohere-green);
+      font-weight: 600;
+    }
+
+    /* ---- READING LIST ---- */
+    .reading-list {
+      list-style: none;
+      padding-left: 0;
+      counter-reset: reading;
+    }
+
+    .reading-list li {
+      counter-increment: reading;
+      position: relative;
+      padding: 0.75rem 0 0.75rem 2.75rem;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .reading-list li:last-child {
+      border-bottom: none;
+    }
+
+    .reading-list li::before {
+      content: counter(reading);
+      position: absolute;
+      left: 0;
+      top: 0.75rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: var(--color-accent-soft);
+      color: var(--cohere-green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.75rem;
+    }
+
+    .paper-title {
+      font-style: italic;
+      color: var(--color-ink);
+      font-weight: 500;
+    }
+
+    .paper-authors {
+      color: var(--color-ink-muted);
+      font-size: 0.9rem;
+    }
+
+    .paper-link {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cohere-green);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .paper-link:hover {
+      border-bottom-color: var(--cohere-green);
+    }
+
+    /* ---- CALLOUT / ASIDE ---- */
+    .callout {
+      border-left: 4px solid var(--color-warm);
+      background: var(--color-warm-soft);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 6px 6px 0;
+      margin: 1.25rem 0;
+    }
+
+    .callout p {
+      color: var(--color-ink-light);
+      margin-bottom: 0.5rem;
+      font-size: 0.92rem;
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    .callout strong {
+      color: var(--color-warm);
+    }
+
+    /* Cohere-styled callout */
+    .callout-cohere {
+      border-left: 4px solid var(--cohere-green);
+      background: var(--color-accent-soft);
+    }
+
+    .callout-cohere strong {
+      color: var(--cohere-green);
+    }
+
+    /* Wayy-styled callout */
+    .callout-wayy {
+      border-left: 4px solid var(--wayy-indigo);
+      background: var(--wayy-indigo-soft);
+    }
+
+    .callout-wayy strong {
+      color: var(--wayy-indigo);
+    }
+
+    /* ---- TABLES ---- */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1rem 0 1.25rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    thead th {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-ink-muted);
+      text-align: left;
+      padding: 0.6rem 1rem;
+      border-bottom: 2px solid var(--color-ink);
+    }
+
+    tbody td {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--color-border-light);
+      color: var(--color-ink-light);
+      vertical-align: top;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--color-bg-subtle);
+    }
+
+    td code, p code, li code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      background: var(--color-accent-soft);
+      color: var(--cohere-green);
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+    }
+
+    /* ---- DIVIDER ---- */
+    .divider {
+      border: none;
+      height: 1px;
+      background: var(--color-border);
+      margin: 2.5rem 0;
+    }
+
+    /* Gradient divider for section breaks */
+    .divider-brand {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cohere-green) 0%, var(--wayy-indigo) 100%);
+      margin: 2.5rem 0;
+      border-radius: 1px;
+    }
+
+    /* ---- NOTES LIST ---- */
+    .notes-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .notes-list li {
+      position: relative;
+      padding: 0.9rem 0 0.9rem 2.5rem;
+      border-bottom: 1px solid var(--color-border-light);
+      color: var(--color-ink-light);
+      line-height: 1.6;
+    }
+
+    .notes-list li:last-child {
+      border-bottom: none;
+    }
+
+    .note-number {
+      position: absolute;
+      left: 0;
+      top: 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--cohere-green);
+    }
+
+    .notes-list li strong {
+      color: var(--color-ink);
+    }
+
+    /* ---- FOOTER ---- */
+    .document-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid var(--color-ink);
+    }
+
+    .footer-orgs {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-org {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .footer-cohere { color: var(--cohere-green); }
+    .footer-wayy { color: var(--wayy-indigo); }
+
+    .footer-tagline {
+      text-align: center;
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--color-ink-muted);
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--color-border-light);
+    }
+
+    /* ---- PUBLISHABILITY TAG ---- */
+    .pub-tag {
+      display: inline-block;
+      background: #e8f0ec;
+      color: var(--cohere-green);
+      font-weight: 600;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: 3px;
+      margin-bottom: 0.75rem;
+    }
+
+    .venue-list {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+
+    .venue {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      background: var(--wayy-indigo-soft);
+      color: var(--wayy-indigo);
+      padding: 0.2rem 0.65rem;
+      border-radius: 3px;
+    }
+
+    /* ---- PRINT STYLES ---- */
+    @media print {
+      body {
+        font-size: 11pt;
+        background: white;
+      }
+
+      .page {
+        padding: 0;
+        max-width: 100%;
+      }
+
+      .collab-banner {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .section {
+        page-break-inside: avoid;
+      }
+
+      .reading-list li {
+        page-break-inside: avoid;
+      }
+
+      .paper-link {
+        color: var(--color-ink-muted);
+      }
+
+      .paper-link::after {
+        content: " (" attr(href) ")";
+        font-size: 0.7rem;
+      }
+
+      .research-question,
+      .callout {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 600px) {
+      .page {
+        padding: 2rem 1.25rem 3rem;
+      }
+
+      .project-title {
+        font-size: 2rem;
+      }
+
+      .header-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .collab-banner {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .footer-orgs {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- COLLABORATION BANNER -->
+  <div class="collab-banner">
+    <div class="collab-org">
+      <span class="collab-org-name">Cohere Labs</span>
+      <span class="collab-org-sub">For the Builder</span>
+    </div>
+    <span class="collab-x">&times;</span>
+    <div class="collab-org">
+      <span class="collab-org-name">Wayy Research</span>
+      <span class="collab-org-sub">Buffalo, NY</span>
+    </div>
+    <span class="collab-badge">Research Collaboration &mdash; 2026</span>
+  </div>
+
+  <!-- HEADER -->
+  <header class="document-header">
+    <div class="header-top">
+      <div class="header-orgs">
+        <span class="org-name org-cohere">Cohere Labs</span>
+        <span class="org-divider">&times;</span>
+        <span class="org-name org-wayy">Wayy Research</span>
+      </div>
+      <span class="doc-type">Research Project Scope</span>
+    </div>
+    <h1 class="project-title">Project Aya</h1>
+    <p class="project-subtitle">
+      Multilingual Transformer-to-Mamba Distillation: Compression, Equity,
+      and the Architecture of Linguistic Inclusion
+    </p>
+    <div class="header-meta">
+      <span class="meta-item"><strong>Lead</strong>&ensp;Rick Galbo, Wayy Research</span>
+      <span class="meta-item"><strong>Built on</strong>&ensp;Cohere Tiny Aya</span>
+      <span class="meta-item"><strong>Date</strong>&ensp;February 2026</span>
+      <span class="meta-item"><strong>Status</strong>&ensp;Scoping</span>
+    </div>
+  </header>
+
+  <!-- 1. RESEARCH QUESTION -->
+  <div class="section">
+    <p class="section-label">Section 1</p>
+    <h2>What is the question we want to answer?</h2>
+    <div class="research-question">
+      <p>
+        Can transformer-based multilingual language models be distilled into
+        Mamba (selective state space) hybrid architectures while preserving
+        multilingual capability, structured tool use, and cross-lingual
+        reasoning&thinsp;&mdash;&thinsp;and does the compression degrade
+        uniformly across language families?
+      </p>
+    </div>
+  </div>
+
+  <!-- 2. MOTIVATION -->
+  <div class="section">
+    <p class="section-label">Section 2</p>
+    <h2>Why is this question important?</h2>
+    <ul>
+      <li>
+        <strong>70%+ of the world&rsquo;s internet users are non-English speakers,</strong>
+        yet most efficient and edge-deployed models are English-centric.
+      </li>
+      <li>
+        Transformers have <strong>O(n&sup2;) attention cost,</strong> making
+        multilingual models impractical on consumer hardware.
+      </li>
+      <li>
+        Mamba offers <strong>O(n) inference with constant memory,</strong> but
+        no multilingual Mamba LLM exists yet.
+      </li>
+      <li>
+        Understanding how compression affects different languages has
+        <strong>equity implications</strong>&thinsp;&mdash;&thinsp;if low-resource
+        languages degrade disproportionately, efficiency gains come at the cost
+        of linguistic inclusion.
+      </li>
+      <li>
+        <strong>Multilingual tool calling</strong> (function calling in non-English
+        languages) is almost entirely unstudied.
+      </li>
+    </ul>
+  </div>
+
+  <!-- 3. PRIOR WORK -->
+  <div class="section">
+    <p class="section-label">Section 3</p>
+    <h2>What work does this build on?</h2>
+    <p>Papers one should read to catch up on the state of the literature relevant to this question:</p>
+    <ol class="reading-list">
+      <li>
+        <span class="paper-title">Mamba: Linear-Time Sequence Modeling with Selective State Spaces</span><br>
+        <span class="paper-authors">Gu &amp; Dao, 2023</span><br>
+        <a class="paper-link" href="https://arxiv.org/abs/2312.00752" target="_blank" rel="noopener">arxiv:2312.00752</a>
+      </li>
+      <li>
+        <span class="paper-title">Mamba-2: Transformers are SSMs &mdash; Generalized Models and Efficient Algorithms Through Structured State Space Duality</span><br>
+        <span class="paper-authors">Dao &amp; Gu, 2024</span><br>
+        <a class="paper-link" href="https://arxiv.org/abs/2405.21060" target="_blank" rel="noopener">arxiv:2405.21060</a>
+      </li>
+      <li>
+        <span class="paper-title">The Mamba in the Llama: Distilling and Accelerating Hybrid Models</span><br>
+        <span class="paper-authors">NeurIPS 2024</span><br>
+        <a class="paper-link" href="https://github.com/jxiw/MambaInLlama" target="_blank" rel="noopener">github.com/jxiw/MambaInLlama</a>
+      </li>
+      <li>
+        <span class="paper-title">CAB: Cross-Architecture Distillation via Attention Bridge</span><br>
+        <span class="paper-authors">2025</span><br>
+        <a class="paper-link" href="https://arxiv.org/abs/2510.19266" target="_blank" rel="noopener">arxiv:2510.19266</a>
+      </li>
+      <li>
+        <span class="paper-title">Tiny Aya Tech Report</span><br>
+        <span class="paper-authors">Cohere Labs, 2026</span><br>
+        <a class="paper-link" href="https://github.com/Cohere-Labs/tiny-aya-tech-report" target="_blank" rel="noopener">github.com/Cohere-Labs/tiny-aya-tech-report</a>
+      </li>
+      <li>
+        <span class="paper-title">Aya Model: An Instruction Finetuned Open-Access Multilingual Language Model</span><br>
+        <span class="paper-authors">&Uuml;st&uuml;n et al., 2024</span><br>
+        <a class="paper-link" href="https://arxiv.org/abs/2402.07827" target="_blank" rel="noopener">arxiv:2402.07827</a>
+      </li>
+      <li>
+        <span class="paper-title">Aya Expanse</span><br>
+        <span class="paper-authors">Dang et al., 2024</span><br>
+        <a class="paper-link" href="https://arxiv.org/abs/2412.04261" target="_blank" rel="noopener">arxiv:2412.04261</a>
+      </li>
+      <li>
+        <span class="paper-title">FalconMamba: The First Competitive Attention-free 7B Language Model</span><br>
+        <span class="paper-authors">Technology Innovation Institute, 2024</span><br>
+        <a class="paper-link" href="https://arxiv.org/abs/2410.05355" target="_blank" rel="noopener">arxiv:2410.05355</a>
+      </li>
+      <li>
+        <span class="paper-title">Multilingual State Space Models for Structured QA in Indic Languages</span><br>
+        <span class="paper-authors">2025</span><br>
+        <a class="paper-link" href="https://arxiv.org/abs/2502.01673" target="_blank" rel="noopener">arxiv:2502.01673</a>
+      </li>
+    </ol>
+  </div>
+
+  <hr class="divider-brand">
+
+  <!-- 4. PUBLISHABILITY -->
+  <div class="section">
+    <p class="section-label">Section 4</p>
+    <h2>Is this a publishable question?</h2>
+    <span class="pub-tag">Highly Publishable &mdash; Novel Intersection</span>
+    <p>
+      The intersection of multilingual NLP and state space model distillation
+      is unexplored. This question has not been published on before, and findings
+      can be shared externally. Specifically:
+    </p>
+    <ul>
+      <li>No multilingual Mamba LLM has been published.</li>
+      <li>Cross-lingual reasoning degradation under architecture distillation has not been studied.</li>
+      <li>Multilingual tool calling benchmarks barely exist.</li>
+      <li>
+        The question of whether compression is equitable across language families
+        is novel and timely (AI equity angle).
+      </li>
+    </ul>
+    <p><strong>Target venues:</strong></p>
+    <div class="venue-list">
+      <span class="venue">EMNLP</span>
+      <span class="venue">ACL</span>
+      <span class="venue">NeurIPS</span>
+      <span class="venue">EACL</span>
+    </div>
+  </div>
+
+  <!-- 5. EXPERIMENTAL SETTING -->
+  <div class="section">
+    <p class="section-label">Section 5</p>
+    <h2>What is the simplest experimental setting?</h2>
+    <p>
+      Take <strong>Tiny Aya base</strong> (3.35B params, 70+ languages) as the teacher.
+      Distill into a <strong>~500&ndash;800M Mamba-MoE hybrid student</strong> using
+      the MambaInLlama 3-stage pipeline:
+    </p>
+    <ol>
+      <li><strong>Layer alignment</strong> &mdash; map transformer attention layers to Mamba SSM blocks</li>
+      <li><strong>KL distillation</strong> &mdash; train student against teacher soft targets</li>
+      <li><strong>Supervised fine-tuning</strong> &mdash; restore multilingual + tool calling capability</li>
+    </ol>
+    <p>
+      Evaluate on <strong>3 benchmarks</strong> across <strong>10 diverse languages</strong>
+      spanning <strong>5 language families.</strong> Measure: perplexity retention,
+      reasoning accuracy, tool call success rate, and CPU inference throughput.
+    </p>
+  </div>
+
+  <!-- 6. BASELINES & BENCHMARKS -->
+  <div class="section">
+    <p class="section-label">Section 6</p>
+    <h2>Key baselines and benchmarks?</h2>
+
+    <h3>Baselines</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Role</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tiny Aya (3.35B)</td>
+            <td>Teacher / upper bound</td>
+            <td>Full transformer, 70+ languages</td>
+          </tr>
+          <tr>
+            <td>Tiny Aya GGUF 4-bit</td>
+            <td>Compressed transformer baseline</td>
+            <td>Quantized, same architecture</td>
+          </tr>
+          <tr>
+            <td>Mamba-2 2.8B</td>
+            <td>English-only Mamba baseline</td>
+            <td>state-spaces reference model</td>
+          </tr>
+          <tr>
+            <td>Random / majority class</td>
+            <td>Lower bound</td>
+            <td>&mdash;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Benchmarks</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Benchmark</th>
+            <th>Scope</th>
+            <th>What It Measures</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>mGSM</strong></td>
+            <td>10 languages, 250 problems each</td>
+            <td>Multilingual grade school math reasoning</td>
+          </tr>
+          <tr>
+            <td><strong>XCOPA</strong></td>
+            <td>11 languages</td>
+            <td>Cross-lingual commonsense reasoning</td>
+          </tr>
+          <tr>
+            <td><strong>Custom tool calling eval</strong></td>
+            <td>10+ languages</td>
+            <td>JSON parse rate, tool selection accuracy, argument correctness</td>
+          </tr>
+          <tr>
+            <td><strong>CPU throughput</strong></td>
+            <td>Hardware benchmark</td>
+            <td>Tokens/sec, memory footprint, time-to-first-token</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider-brand">
+
+  <!-- 7. RESOURCES -->
+  <div class="section">
+    <p class="section-label">Section 7</p>
+    <h2>What resources do we plan to use?</h2>
+
+    <h3>Datasets</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Purpose</th>
+            <th>Dataset</th>
+            <th>Access</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Teacher pretraining</td>
+            <td>CulturaX, mC4, multilingual instruction data</td>
+            <td>Via pretrained model (not redistributed)</td>
+          </tr>
+          <tr>
+            <td>Distillation</td>
+            <td>mC4 multilingual subset, Aya Collection</td>
+            <td>Open (HuggingFace)</td>
+          </tr>
+          <tr>
+            <td>Tool calling SFT</td>
+            <td>Self-generated multilingual tool call examples</td>
+            <td>10 languages &times; 500&ndash;1,000 examples</td>
+          </tr>
+          <tr>
+            <td>Evaluation</td>
+            <td>mGSM (Google), XCOPA (Ponti et al.)</td>
+            <td>Open</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Models</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Model</th>
+            <th>Parameters</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Teacher</strong></td>
+            <td><code>CohereLabs/tiny-aya-base</code> + <code>tiny-aya-global</code></td>
+            <td>3.35B</td>
+          </tr>
+          <tr>
+            <td><strong>Student</strong></td>
+            <td>Custom Mamba-MoE hybrid (Aetheris architecture)</td>
+            <td>~500&ndash;800M</td>
+          </tr>
+          <tr>
+            <td><strong>Comparison</strong></td>
+            <td>Mamba-2 2.8B, FalconMamba-7B</td>
+            <td>2.8B / 7B</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Evaluation Metrics</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Granularity</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Perplexity</td>
+            <td>Per-language, held-out mC4</td>
+            <td>Quality</td>
+          </tr>
+          <tr>
+            <td>mGSM accuracy</td>
+            <td>Per-language</td>
+            <td>Reasoning</td>
+          </tr>
+          <tr>
+            <td>XCOPA accuracy</td>
+            <td>Per-language</td>
+            <td>Reasoning</td>
+          </tr>
+          <tr>
+            <td>Tool call JSON parse success</td>
+            <td>Per-language</td>
+            <td>Tool use</td>
+          </tr>
+          <tr>
+            <td>Tool selection accuracy</td>
+            <td>Per-language</td>
+            <td>Tool use</td>
+          </tr>
+          <tr>
+            <td>Inference throughput</td>
+            <td>Tokens/sec on consumer CPU</td>
+            <td>Efficiency</td>
+          </tr>
+          <tr>
+            <td>Memory footprint</td>
+            <td>Peak RAM during inference</td>
+            <td>Efficiency</td>
+          </tr>
+          <tr>
+            <td>Compression ratio</td>
+            <td>Params, disk size, RAM</td>
+            <td>Efficiency</td>
+          </tr>
+          <tr>
+            <td><strong>Degradation equity score</strong></td>
+            <td>Variance of accuracy drop across language families</td>
+            <td>Equity</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Annotation Resources</h3>
+    <ul>
+      <li>
+        <strong>No human annotation required</strong> for core experiments.
+      </li>
+      <li>
+        Tool call SFT data: machine-generated using Tiny Aya as teacher,
+        validated programmatically via JSON schema validation.
+      </li>
+      <li>
+        <em>Optional:</em> human evaluation of tool call quality in 3&ndash;5
+        languages, if time permits.
+      </li>
+    </ul>
+
+    <h3>Other Resources</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Resource</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Compute</strong></td>
+            <td>1&times; A100 80GB (Runpod, ~$1.49/hr) for distillation training</td>
+          </tr>
+          <tr>
+            <td><strong>Aetheris codebase</strong></td>
+            <td>Existing Mamba-MoE implementation: selective scan, MoE routing, streaming dataset, trainer</td>
+          </tr>
+          <tr>
+            <td><strong>llama.cpp</strong></td>
+            <td>Mamba-1/2 GGUF support for CPU inference benchmarking</td>
+          </tr>
+          <tr>
+            <td><strong>outlines</strong></td>
+            <td>Constrained JSON generation for tool calling evaluation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider-brand">
+
+  <!-- 8. NOTES & OPEN QUESTIONS -->
+  <div class="section">
+    <p class="section-label">Section 8</p>
+    <h2>Additional Notes &amp; Open Questions</h2>
+
+    <ol class="notes-list">
+      <li>
+        <span class="note-number">01</span>
+        <strong>Tokenizer mismatch.</strong>
+        Aetheris uses GPT-2 vocab (50k), Aya uses 262k multilingual BPE.
+        The embedding table alone will be ~500MB. Is there a way to prune
+        the tokenizer for a target language subset without losing the
+        multilingual benefit?
+      </li>
+      <li>
+        <span class="note-number">02</span>
+        <strong>Language family hypothesis.</strong>
+        We predict agglutinative languages (Turkish, Finnish, Japanese) will
+        degrade more under distillation because their token-level dependencies
+        span longer ranges&thinsp;&mdash;&thinsp;exactly what attention handles
+        well and SSMs may struggle with.
+      </li>
+      <li>
+        <span class="note-number">03</span>
+        <strong>MoE routing analysis.</strong>
+        Do different experts specialize by language family? If so, can we use
+        this to build &ldquo;regional&rdquo; variants (similar to Tiny Aya&rsquo;s
+        earth/fire/water split)?
+      </li>
+      <li>
+        <span class="note-number">04</span>
+        <strong>Baseline experiment (Day 1&ndash;2).</strong>
+        Load Tiny Aya, run inference in 5 languages, measure CPU tokens/sec.
+        This number is the bar the distilled model must beat.
+      </li>
+      <li>
+        <span class="note-number">05</span>
+        <strong>Tool calling format.</strong>
+        Using <code>&lt;tool_call&gt;</code> special tokens already implemented
+        in Aetheris data pipeline. Need to verify this format works with
+        Aya&rsquo;s tokenizer.
+      </li>
+      <li>
+        <span class="note-number">06</span>
+        <strong>Licensing.</strong>
+        The CC-BY-NC license on Tiny Aya means this research can be published
+        but the distilled model weights cannot be used commercially without
+        Cohere&rsquo;s permission.
+      </li>
+    </ol>
+
+    <div class="callout">
+      <p>
+        <strong>Note on licensing:</strong> The CC-BY-NC constraint on the
+        teacher model applies transitively to distilled weights. Plan for
+        an academic release path. Commercial deployment would require either
+        a license agreement with Cohere or a re-distillation from a
+        permissively licensed teacher.
+      </p>
+    </div>
+
+    <div class="callout-cohere callout">
+      <p>
+        <strong>From Cohere Labs:</strong> Tiny Aya was built with the
+        conviction that language technology should serve everyone, not just
+        English speakers. This collaboration extends that mission &mdash;
+        making multilingual AI not just capable, but <em>runnable</em>
+        on the hardware people actually have.
+      </p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="document-footer">
+    <div class="footer-orgs">
+      <span class="footer-org footer-cohere">Cohere Labs &mdash; For the Builder</span>
+      <span class="footer-org footer-wayy">Wayy Research &mdash; Buffalo, NY</span>
+    </div>
+    <p class="footer-tagline">
+      &ldquo;People for research, research for people.&rdquo;
+    </p>
+  </footer>
+
+</div>
+
+</body>
+</html>

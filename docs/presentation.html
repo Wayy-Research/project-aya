@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Aya — Cohere Labs × Wayy Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,500&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+SC:wght@400;600&family=Noto+Sans+Arabic:wght@400;600&family=Noto+Sans+JP:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-page: #FFFBF7;
+    --bg-warm: #FFF6EE;
+    --bg-card: #FFFFFF;
+    --bg-tint: #FEF0E4;
+    --bg-green-tint: #EDFBF0;
+    --bg-blue-tint: #EEF2FF;
+    --bg-purple-tint: #F5F0FF;
+
+    --coral: #E8553D;
+    --coral-light: #FF8A73;
+    --coral-bg: rgba(232, 85, 61, 0.08);
+    --amber: #E8943D;
+    --amber-bg: rgba(232, 148, 61, 0.1);
+    --green: #2AAA5B;
+    --green-bg: rgba(42, 170, 91, 0.08);
+    --blue: #4C6EE6;
+    --blue-bg: rgba(76, 110, 230, 0.08);
+    --purple: #7C5CE6;
+
+    --text-primary: #1A1A2E;
+    --text-secondary: #555570;
+    --text-muted: #8E8EA0;
+    --text-light: #B0B0C0;
+
+    --border: rgba(0, 0, 0, 0.06);
+    --border-hover: rgba(0, 0, 0, 0.12);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.03);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.03);
+    --shadow-glow: 0 8px 30px rgba(232, 85, 61, 0.12);
+
+    --font-display: 'Fraunces', 'Georgia', serif;
+    --font-body: 'Outfit', 'Helvetica Neue', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --radius: 1.25rem;
+    --radius-sm: 0.75rem;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: clamp(14px, 1.1vw, 18px);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--coral-light);
+    color: white;
+  }
+
+  /* ═══════════════════════════════════════════
+     ORGANIC BACKGROUND
+     ═══════════════════════════════════════════ */
+  .organic-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  /* ═══════════════════════════════════════════
+     LAYOUT
+     ═══════════════════════════════════════════ */
+  .container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 clamp(1.5rem, 4vw, 3rem);
+  }
+
+  section { position: relative; z-index: 1; }
+
+  /* ═══════════════════════════════════════════
+     NAVIGATION
+     ═══════════════════════════════════════════ */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0.9rem clamp(1.5rem, 4vw, 3rem);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    background: rgba(255, 251, 247, 0.8);
+    border-bottom: 1px solid var(--border);
+  }
+
+  nav .nav-brand {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  nav .nav-brand span { color: var(--coral); }
+
+  nav .nav-clock {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    background: white;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ═══════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════ */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 6rem 2rem 4rem;
+  }
+
+  .hero-gradient {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 30%, rgba(232,85,61,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 20% 70%, rgba(76,110,230,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 35% at 80% 60%, rgba(42,170,91,0.04) 0%, transparent 60%);
+    animation: hero-breathe 10s ease-in-out infinite alternate;
+  }
+
+  @keyframes hero-breathe {
+    0% { opacity: 0.7; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.04); }
+  }
+
+  .hero-fern {
+    position: absolute;
+    font-size: 18rem;
+    opacity: 0.04;
+    user-select: none;
+    line-height: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--green);
+  }
+
+  .hero-content { position: relative; z-index: 1; }
+
+  .hero-collab {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .hero-collab .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--coral-light);
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(4rem, 13vw, 10rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin-bottom: 1.8rem;
+  }
+
+  .hero h1 .aya-accent {
+    color: var(--coral);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .hero-subtitle {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(1.05rem, 2vw, 1.45rem);
+    color: var(--text-secondary);
+    max-width: 620px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.45;
+  }
+
+  .hero-tags {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-tags .tag {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 0.4rem 1.1rem;
+    border-radius: 999px;
+    background: white;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+  }
+
+  .hero-tags .tag:nth-child(1) { border-color: rgba(232,85,61,0.2); color: var(--coral); }
+  .hero-tags .tag:nth-child(2) { border-color: rgba(42,170,91,0.2); color: var(--green); }
+  .hero-tags .tag:nth-child(3) { border-color: rgba(76,110,230,0.2); color: var(--blue); }
+  .hero-tags .tag:nth-child(4) { border-color: rgba(232,148,61,0.2); color: var(--amber); }
+
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-light);
+    font-family: var(--font-body);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: scroll-bob 2.5s ease-in-out infinite;
+  }
+
+  .hero-scroll-hint .line {
+    width: 1px; height: 2rem;
+    background: linear-gradient(to bottom, var(--text-light), transparent);
+  }
+
+  @keyframes scroll-bob {
+    0%, 100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 0.8; transform: translateX(-50%) translateY(5px); }
+  }
+
+  /* ═══════════════════════════════════════════
+     MARQUEE
+     ═══════════════════════════════════════════ */
+  .marquee-section {
+    background: linear-gradient(135deg, var(--coral) 0%, var(--coral-light) 50%, var(--amber) 100%);
+    padding: 0.9rem 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 35s linear infinite;
+  }
+
+  .marquee-track:hover { animation-play-state: paused; }
+
+  .marquee-text {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: white;
+    white-space: nowrap;
+    padding-right: 3rem;
+  }
+
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ═══════════════════════════════════════════
+     SECTION STYLING
+     ═══════════════════════════════════════════ */
+  .section-padding {
+    padding: clamp(4.5rem, 9vh, 8rem) 0;
+  }
+
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 1.2rem; height: 2px;
+    background: var(--coral-light);
+    border-radius: 2px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+    margin-bottom: 1.2rem;
+  }
+
+  .section-desc {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* ═══════════════════════════════════════════
+     STAT CARDS
+     ═══════════════════════════════════════════ */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 3rem;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2.2rem 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.4s ease, transform 0.4s var(--ease-out-expo);
+  }
+
+  .stat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--coral), var(--coral-light)); }
+  .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+  .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--green), #5ED886); }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 3.2rem;
+    line-height: 1;
+    margin-bottom: 0.8rem;
+  }
+
+  .stat-card:nth-child(1) .stat-number { color: var(--coral); }
+  .stat-card:nth-child(2) .stat-number { color: var(--blue); }
+  .stat-card:nth-child(3) .stat-number { color: var(--green); }
+
+  .stat-label {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  /* ═══════════════════════════════════════════
+     RESEARCH QUESTION
+     ═══════════════════════════════════════════ */
+  .question-section {
+    background: var(--bg-warm);
+    position: relative;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .question-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 0% 50%, var(--coral-bg), transparent);
+    pointer-events: none;
+  }
+
+  .question-content {
+    padding: clamp(4rem, 8vh, 7rem) 0;
+  }
+
+  .question-mark {
+    font-family: var(--font-display);
+    font-size: 10rem;
+    line-height: 1;
+    color: var(--coral);
+    opacity: 0.08;
+    position: absolute;
+    top: 0.5rem;
+    left: clamp(1rem, 3vw, 2.5rem);
+    user-select: none;
+  }
+
+  .question-text {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(1.3rem, 2.8vw, 2.2rem);
+    line-height: 1.4;
+    color: var(--text-primary);
+    max-width: 850px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ═══════════════════════════════════════════
+     ARCHITECTURE
+     ═══════════════════════════════════════════ */
+  .distill-diagram {
+    margin: 3rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+
+  .distill-node {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 2.5rem;
+    text-align: center;
+    min-width: 220px;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s var(--ease-out-expo);
+  }
+
+  .distill-node:hover { transform: translateY(-2px); }
+
+  .distill-node.teacher { border-left: 3px solid var(--blue); }
+  .distill-node.student { border-left: 3px solid var(--coral); }
+
+  .distill-node .node-label {
+    font-family: var(--font-body);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .distill-node.teacher .node-label { color: var(--blue); }
+  .distill-node.student .node-label { color: var(--coral); }
+
+  .distill-node .node-name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+
+  .distill-node .node-params {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .distill-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 1rem 2rem;
+    color: var(--text-muted);
+  }
+
+  .distill-arrow .arrow-line {
+    width: 4rem; height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--coral));
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .distill-arrow .arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -5px; top: -4px;
+    width: 0; height: 0;
+    border-left: 8px solid var(--coral);
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+
+  .distill-arrow .arrow-label {
+    font-family: var(--font-body);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .pipeline-steps { margin: 3rem 0; }
+
+  .pipeline-steps h3 {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1.2rem;
+  }
+
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .pipeline-step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1.4rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.3s ease, transform 0.3s var(--ease-out-expo);
+  }
+
+  .pipeline-step:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
+  .step-num {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: white;
+    width: 2rem; height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .pipeline-step:nth-child(1) .step-num { background: var(--coral); }
+  .pipeline-step:nth-child(2) .step-num { background: var(--blue); }
+  .pipeline-step:nth-child(3) .step-num { background: var(--green); }
+
+  .step-content h4 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .step-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .arch-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+
+  .arch-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.3s ease, transform 0.4s var(--ease-out-expo);
+  }
+
+  .arch-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+  }
+
+  .arch-card-icon {
+    width: 2.8rem; height: 2.8rem;
+    border-radius: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .arch-card:nth-child(1) .arch-card-icon { background: var(--coral-bg); color: var(--coral); }
+  .arch-card:nth-child(2) .arch-card-icon { background: var(--blue-bg); color: var(--blue); }
+  .arch-card:nth-child(3) .arch-card-icon { background: var(--green-bg); color: var(--green); }
+
+  .arch-card h4 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1.02rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .arch-card p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  /* ═══════════════════════════════════════════
+     LANGUAGES GRID
+     ═══════════════════════════════════════════ */
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+  }
+
+  .lang-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1.4rem 1rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.3s ease, transform 0.3s var(--ease-out-expo), border-color 0.3s;
+    cursor: default;
+  }
+
+  .lang-card:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-4px);
+    border-color: rgba(232,85,61,0.2);
+  }
+
+  .lang-greeting {
+    font-family: 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans SC', 'Noto Sans Arabic', 'Noto Sans JP', 'Noto Sans Telugu', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .lang-name {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.15rem;
+    color: var(--text-primary);
+  }
+
+  .lang-family {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ═══════════════════════════════════════════
+     EVALUATION
+     ═══════════════════════════════════════════ */
+  .eval-table {
+    margin-top: 2.5rem;
+    width: 100%;
+  }
+
+  .eval-row {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 1.5rem;
+    padding: 1.3rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: baseline;
+  }
+
+  .eval-row:first-child { border-top: 1px solid var(--border); }
+
+  .eval-name {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .eval-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  .equity-callout {
+    margin-top: 2.5rem;
+    background: linear-gradient(135deg, var(--bg-tint) 0%, var(--bg-warm) 100%);
+    border: 1px solid rgba(232,85,61,0.15);
+    border-left: 3px solid var(--coral);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 1.8rem 2.2rem;
+  }
+
+  .equity-callout h4 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--coral);
+    margin-bottom: 0.4rem;
+  }
+
+  .equity-callout p {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+
+  .equity-callout .equity-tagline {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    margin-top: 0.7rem;
+  }
+
+  /* ═══════════════════════════════════════════
+     TECH STACK
+     ═══════════════════════════════════════════ */
+  .tech-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 2rem;
+  }
+
+  .tech-pill {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    padding: 0.5rem 1.2rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  .tech-pill:hover {
+    border-color: rgba(232,85,61,0.25);
+    color: var(--coral);
+    background: var(--bg-tint);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+
+  /* ═══════════════════════════════════════════
+     PHASES
+     ═══════════════════════════════════════════ */
+  .phases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+
+  .phase-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2.2rem 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.3s ease, transform 0.3s var(--ease-out-expo);
+  }
+
+  .phase-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+  }
+
+  .phase-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .phase-card:nth-child(1)::before { background: var(--coral); }
+  .phase-card:nth-child(2)::before { background: var(--blue); }
+  .phase-card:nth-child(3)::before { background: var(--green); }
+
+  .phase-number {
+    font-family: var(--font-body);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+
+  .phase-card:nth-child(1) .phase-number { color: var(--coral); }
+  .phase-card:nth-child(2) .phase-number { color: var(--blue); }
+  .phase-card:nth-child(3) .phase-number { color: var(--green); }
+
+  .phase-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.7rem;
+    margin-bottom: 0.7rem;
+    color: var(--text-primary);
+  }
+
+  .phase-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════ */
+  footer {
+    position: relative;
+    z-index: 1;
+    background: var(--bg-warm);
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .footer-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.04;
+    pointer-events: none;
+  }
+
+  .footer-content {
+    position: relative;
+    z-index: 1;
+    padding: clamp(4rem, 8vh, 6rem) clamp(1.5rem, 4vw, 3rem);
+    max-width: 1140px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .footer-collab {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 0.8rem;
+  }
+
+  .footer-collab span { color: var(--coral); }
+
+  .footer-location {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .footer-tagline {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+  }
+
+  .footer-bottom {
+    margin-top: 2.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--text-light);
+    letter-spacing: 0.06em;
+  }
+
+  /* ═══════════════════════════════════════════
+     ANIMATIONS
+     ═══════════════════════════════════════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  .reveal-delay-1 { transition-delay: 0.06s; }
+  .reveal-delay-2 { transition-delay: 0.12s; }
+  .reveal-delay-3 { transition-delay: 0.18s; }
+  .reveal-delay-4 { transition-delay: 0.24s; }
+  .reveal-delay-5 { transition-delay: 0.30s; }
+  .reveal-delay-6 { transition-delay: 0.36s; }
+  .reveal-delay-7 { transition-delay: 0.42s; }
+  .reveal-delay-8 { transition-delay: 0.48s; }
+  .reveal-delay-9 { transition-delay: 0.54s; }
+
+  .hero .reveal {
+    transform: translateY(32px);
+    transition-duration: 0.9s;
+  }
+
+  /* ═══════════════════════════════════════════
+     SEPARATOR
+     ═══════════════════════════════════════════ */
+  .sep {
+    height: 1px;
+    background: var(--border);
+    margin: 0 clamp(1.5rem, 4vw, 3rem);
+  }
+
+  /* ═══════════════════════════════════════════
+     RESPONSIVE
+     ═══════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    .distill-diagram { flex-direction: column; }
+    .distill-arrow { transform: rotate(90deg); padding: 0.5rem 1rem; }
+    .eval-row { grid-template-columns: 1fr; gap: 0.25rem; }
+    .lang-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 3.2rem; }
+    .hero-collab { flex-direction: column; gap: 0.3rem; }
+    .hero-collab .dot { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Organic background pattern -->
+<svg class="organic-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="cells" x="0" y="0" width="280" height="280" patternUnits="userSpaceOnUse">
+      <path d="M140 10 L170 45 L250 30 L270 85 L240 140 L270 195 L250 250 L170 235 L140 270 L110 235 L30 250 L10 195 L40 140 L10 85 L30 30 L110 45 Z" fill="none" stroke="#E8553D" stroke-width="0.4" opacity="0.3"/>
+      <path d="M140 45 L185 70 L200 140 L185 210 L140 235 L95 210 L80 140 L95 70 Z" fill="none" stroke="#4C6EE6" stroke-width="0.3" opacity="0.2"/>
+      <circle cx="140" cy="140" r="30" fill="none" stroke="#2AAA5B" stroke-width="0.3" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#cells)"/>
+</svg>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-brand">Project <span>Aya</span></div>
+  <div class="nav-clock" id="clock"></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-gradient"></div>
+  <div class="hero-fern">&#x1F33F;</div>
+  <div class="hero-content">
+    <div class="hero-collab reveal reveal-delay-1">
+      <span>Cohere Labs</span>
+      <span class="dot"></span>
+      <span>Wayy Research</span>
+    </div>
+    <h1 class="reveal reveal-delay-2">Project <span class="aya-accent">Aya</span></h1>
+    <p class="hero-subtitle reveal reveal-delay-3">Compression, Equity, and the Architecture of Linguistic Inclusion</p>
+    <div class="hero-tags reveal reveal-delay-4">
+      <span class="tag">Multilingual</span>
+      <span class="tag">Mamba</span>
+      <span class="tag">Distillation</span>
+      <span class="tag">Open Science</span>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">
+    <span>Scroll</span>
+    <div class="line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<section class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-text">Multilingual &middot; Mamba &middot; Distillation &middot; 70+ Languages &middot; Open Science &middot; Est. 2026 &middot; Buffalo, NY &middot; Hybrid Mamba-MoE &middot; Linguistic Equity &middot; Edge Deployment &middot;&nbsp;</span>
+    <span class="marquee-text">Multilingual &middot; Mamba &middot; Distillation &middot; 70+ Languages &middot; Open Science &middot; Est. 2026 &middot; Buffalo, NY &middot; Hybrid Mamba-MoE &middot; Linguistic Equity &middot; Edge Deployment &middot;&nbsp;</span>
+  </div>
+</section>
+
+<!-- THE PROBLEM -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-label reveal">01 &mdash; Context</div>
+    <h2 class="section-title reveal reveal-delay-1">The Problem</h2>
+    <p class="section-desc reveal reveal-delay-2">Most efficient AI models are English-centric. The architecture of language technology is leaving billions behind.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card reveal reveal-delay-3">
+        <div class="stat-number">70%+</div>
+        <div class="stat-label">of internet users are non-English speakers, yet most edge-deployed models serve English only</div>
+      </div>
+      <div class="stat-card reveal reveal-delay-4">
+        <div class="stat-number">O(n&sup2;)</div>
+        <div class="stat-label">Transformer attention cost makes multilingual models impractical on consumer hardware and edge devices</div>
+      </div>
+      <div class="stat-card reveal reveal-delay-5">
+        <div class="stat-number">0</div>
+        <div class="stat-label">Multilingual Mamba large language models exist today &mdash; this gap is the opportunity</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- RESEARCH QUESTION -->
+<section class="question-section">
+  <div class="question-mark">&ldquo;</div>
+  <div class="container">
+    <div class="question-content">
+      <div class="section-label reveal">02 &mdash; The Question</div>
+      <p class="question-text reveal reveal-delay-1">Can transformer-based multilingual models be distilled into Mamba architectures while preserving multilingual capability, structured tool use, and cross-lingual reasoning &mdash; and does the compression degrade uniformly across language families?</p>
+    </div>
+  </div>
+</section>
+
+<!-- THE APPROACH -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-label reveal">03 &mdash; Architecture</div>
+    <h2 class="section-title reveal reveal-delay-1">Aetheris: Hybrid Mamba-MoE</h2>
+    <p class="section-desc reveal reveal-delay-2">A novel student architecture combining selective state spaces with sparse mixture-of-experts, distilled from Cohere's Tiny Aya.</p>
+
+    <div class="distill-diagram reveal reveal-delay-3">
+      <div class="distill-node teacher">
+        <div class="node-label">Teacher</div>
+        <div class="node-name">Tiny Aya</div>
+        <div class="node-params">3.35B params &middot; 70+ langs</div>
+      </div>
+      <div class="distill-arrow">
+        <div class="arrow-label">distill</div>
+        <div class="arrow-line"></div>
+      </div>
+      <div class="distill-node student">
+        <div class="node-label">Student</div>
+        <div class="node-name">Aetheris</div>
+        <div class="node-params">~500&ndash;800M params &middot; Mamba-MoE</div>
+      </div>
+    </div>
+
+    <div class="pipeline-steps reveal reveal-delay-4">
+      <h3>3-Stage MambaInLlama Pipeline</h3>
+      <div class="pipeline-grid">
+        <div class="pipeline-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Layer Alignment</h4>
+            <p>Map transformer attention layers to Mamba SSM blocks with structural correspondence</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>KL Distillation</h4>
+            <p>Soft-target training with KL divergence to transfer knowledge from teacher to student</p>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Supervised Fine-Tuning</h4>
+            <p>Restore multilingual capability and structured tool calling via targeted SFT</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-cards">
+      <div class="arch-card reveal reveal-delay-5">
+        <div class="arch-card-icon">&psi;</div>
+        <h4>SSM Blocks</h4>
+        <p>O(n) selective scan with constant memory. The Mamba backbone enables linear-time sequence processing.</p>
+      </div>
+      <div class="arch-card reveal reveal-delay-6">
+        <div class="arch-card-icon">&Sigma;</div>
+        <h4>Sparse MoE</h4>
+        <p>4 expert FFNs with top-1 routing and load balancing. Only one expert fires per token &mdash; efficient and specialized.</p>
+      </div>
+      <div class="arch-card reveal reveal-delay-7">
+        <div class="arch-card-icon">&Delta;</div>
+        <h4>Hybrid Design</h4>
+        <p>SSM blocks on odd layers, MoE on even layers. 24 total layers with weight-tied embeddings and gradient checkpointing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- LANGUAGES -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-label reveal">04 &mdash; Scope</div>
+    <h2 class="section-title reveal reveal-delay-1">10 Languages, 5 Families</h2>
+    <p class="section-desc reveal reveal-delay-2">We evaluate across diverse typologies &mdash; analytic, agglutinative, fusional, polysynthetic &mdash; to measure whether compression is equitable.</p>
+
+    <div class="lang-grid">
+      <div class="lang-card reveal reveal-delay-1">
+        <div class="lang-greeting">Hello</div>
+        <div class="lang-name">English</div>
+        <div class="lang-family">Indo-European</div>
+      </div>
+      <div class="lang-card reveal reveal-delay-2">
+        <div class="lang-greeting">Hola</div>
+        <div class="lang-name">Spanish</div>
+        <div class="lang-family">Indo-European</div>
+      </div>
+      <div class="lang-card reveal reveal-delay-3">
+        <div class="lang-greeting">&#2344;&#2350;&#2360;&#2381;&#2340;&#2375;</div>
+        <div class="lang-name">Hindi</div>
+        <div class="lang-family">Indo-European</div>
+      </div>
+      <div class="lang-card reveal reveal-delay-4">
+        <div class="lang-greeting">&#20320;&#22909;</div>
+        <div class="lang-name">Mandarin</div>
+        <div class="lang-family">Sino-Tibetan</div>
+      </div>
+      <div class="lang-card reveal reveal-delay-5">
+        <div class="lang-greeting">&#1605;&#1585;&#1581;&#1576;&#1575;</div>
+        <div class="lang-name">Arabic</div>
+        <div class="lang-family">Afroasiatic</div>
+      </div>
+      <div class="lang-card reveal reveal-delay-6">
+        <div class="lang-greeting">Habari</div>
+        <div class="lang-name">Swahili</div>
+        <div class="lang-family">Niger-Congo</div>
+      </div>
+      <div class="lang-card reveal reveal-delay-7">
+        <div class="lang-greeting">Merhaba</div>
+        <div class="lang-name">Turkish</div>
+        <div class="lang-family">Turkic</div>
+      </div>
+      <div class="lang-card reveal reveal-delay-8">
+        <div class="lang-greeting">&#12371;&#12435;&#12395;&#12385;&#12399;</div>
+        <div class="lang-name">Japanese</div>
+        <div class="lang-family">Japonic</div>
+      </div>
+      <div class="lang-card reveal reveal-delay-9">
+        <div class="lang-greeting">Halo</div>
+        <div class="lang-name">Indonesian</div>
+        <div class="lang-family">Austronesian</div>
+      </div>
+      <div class="lang-card reveal reveal-delay-9">
+        <div class="lang-greeting">&#3129;&#3122;&#3147;</div>
+        <div class="lang-name">Telugu</div>
+        <div class="lang-family">Dravidian</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- EVALUATION -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-label reveal">05 &mdash; Evaluation</div>
+    <h2 class="section-title reveal reveal-delay-1">Measuring Equity</h2>
+    <p class="section-desc reveal reveal-delay-2">Benchmarks designed to reveal whether compression harms some languages more than others.</p>
+
+    <div class="eval-table">
+      <div class="eval-row reveal reveal-delay-3">
+        <div class="eval-name">mGSM</div>
+        <div class="eval-desc">Multilingual grade school math &mdash; 10 languages, 250 problems each. Tests arithmetic reasoning across scripts.</div>
+      </div>
+      <div class="eval-row reveal reveal-delay-4">
+        <div class="eval-name">XCOPA</div>
+        <div class="eval-desc">Cross-lingual commonsense reasoning &mdash; 11 languages. Causal inference beyond English-centric assumptions.</div>
+      </div>
+      <div class="eval-row reveal reveal-delay-5">
+        <div class="eval-name">Tool Calling</div>
+        <div class="eval-desc">Structured JSON generation and function selection in 10+ languages. Nearly unstudied in multilingual settings.</div>
+      </div>
+      <div class="eval-row reveal reveal-delay-6">
+        <div class="eval-name">CPU Throughput</div>
+        <div class="eval-desc">Tokens/sec, peak memory, time-to-first-token. The whole point is running on consumer hardware.</div>
+      </div>
+    </div>
+
+    <div class="equity-callout reveal reveal-delay-7">
+      <h4>Degradation Equity Score</h4>
+      <p>The variance of accuracy drop across language families after distillation. Measures whether compression picks winners and losers.</p>
+      <p class="equity-tagline">Lower is better. Compression should not pick winners.</p>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- TECH STACK -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-label reveal">06 &mdash; Stack</div>
+    <h2 class="section-title reveal reveal-delay-1">Built With</h2>
+
+    <div class="tech-grid reveal reveal-delay-2">
+      <span class="tech-pill">PyTorch</span>
+      <span class="tech-pill">HuggingFace Transformers</span>
+      <span class="tech-pill">HuggingFace Datasets</span>
+      <span class="tech-pill">FastAPI</span>
+      <span class="tech-pill">Mamba SSM</span>
+      <span class="tech-pill">Docker</span>
+      <span class="tech-pill">GitHub Actions</span>
+      <span class="tech-pill">CUDA</span>
+      <span class="tech-pill">llama.cpp</span>
+      <span class="tech-pill">Pydantic</span>
+      <span class="tech-pill">SSE Streaming</span>
+      <span class="tech-pill">RunPod A100</span>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- PHASES -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-label reveal">07 &mdash; Roadmap</div>
+    <h2 class="section-title reveal reveal-delay-1">Three Phases</h2>
+
+    <div class="phases-grid">
+      <div class="phase-card reveal reveal-delay-2">
+        <div class="phase-number">Phase 01</div>
+        <div class="phase-title">Baseline</div>
+        <div class="phase-desc">Load Tiny Aya, establish CPU tokens/sec in 5 languages. This is the bar the distilled model must beat. Validate tokenizer compatibility.</div>
+      </div>
+      <div class="phase-card reveal reveal-delay-3">
+        <div class="phase-number">Phase 02</div>
+        <div class="phase-title">Distillation</div>
+        <div class="phase-desc">Execute 3-stage MambaInLlama pipeline on A100. Layer alignment, KL distillation, then multilingual SFT with tool calling recovery.</div>
+      </div>
+      <div class="phase-card reveal reveal-delay-4">
+        <div class="phase-number">Phase 03</div>
+        <div class="phase-title">Evaluation</div>
+        <div class="phase-desc">Full benchmark suite across 10 languages. Equity analysis, ablation studies, and paper preparation targeting EMNLP / ACL / NeurIPS.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <svg class="footer-pattern" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <pattern id="footer-cells" x="0" y="0" width="180" height="180" patternUnits="userSpaceOnUse">
+        <path d="M90 5 L120 35 L165 22 L178 65 L155 90 L178 120 L160 158 L120 148 L90 175 L60 148 L20 158 L2 120 L25 90 L2 65 L15 22 L60 35 Z" fill="none" stroke="#E8553D" stroke-width="0.5" opacity="0.4"/>
+        <circle cx="90" cy="90" r="25" fill="none" stroke="#4C6EE6" stroke-width="0.3" opacity="0.25"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#footer-cells)"/>
+  </svg>
+
+  <div class="footer-content">
+    <div class="footer-collab reveal">Cohere Labs <span>&times;</span> Wayy Research</div>
+    <div class="footer-location reveal reveal-delay-1">Buffalo, NY &mdash; 2026</div>
+    <div class="footer-tagline reveal reveal-delay-2">Open Science. Open Weights. Open Questions.</div>
+    <div class="footer-bottom reveal reveal-delay-3">
+      Project Aya &middot; Multilingual Transformer-to-Mamba Distillation &middot; CC-BY-NC
+    </div>
+  </div>
+</footer>
+
+<script>
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  setTimeout(() => {
+    document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('visible'));
+  }, 200);
+</script>
+</body>
+</html>

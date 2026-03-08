@@ -1,0 +1,48 @@
+# Distillation with NVIDIA ClimbMix dataset
+#
+# ClimbMix: 400B tokens, CLIMB-filtered from Nemotron-CC + SmolLM-Corpus
+# Outperforms FineWeb-Edu, DCLM, and Olmo under equal token budgets.
+#
+# Reference:
+#   - Paper: https://arxiv.org/abs/2504.13161
+#   - Dataset: https://huggingface.co/datasets/nvidia/ClimbMix
+#   - Karpathy nanochat result: GPT-2 quality in 2hr on 8xH100
+#
+# Two modes available:
+#   pretokenized: use GPT-2 tokens directly (fast, student must use GPT-2 vocab)
+#   retokenize: decode → re-encode with Aya tokenizer (slower, full vocab)
+
+stage: "kl_distillation"
+
+teacher:
+  name: "CohereForAI/aya-expanse-8b"
+  dtype: "bfloat16"
+  device_map: "auto"
+
+student:
+  config_path: "configs/student.yaml"
+  dtype: "bfloat16"
+
+data:
+  dataset: "nvidia/ClimbMix"
+  mode: "retokenize"  # retokenize for Aya vocab compatibility
+  max_seq_len: 1024
+  batch_size: 4
+  buffer_size: 500
+  min_tokens: 32
+  streaming: true
+
+training:
+  lr: 5e-5
+  warmup_steps: 500
+  total_steps: 20000
+  gradient_accumulation: 8
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+
+kl:
+  temperature: 2.0
+  alpha: 0.7  # 0.7 * KL + 0.3 * CE
+
+output_dir: "checkpoints/climbmix_distill"
+seed: 42

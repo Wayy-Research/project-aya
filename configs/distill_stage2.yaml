@@ -1,0 +1,38 @@
+## Stage 2: KL Distillation
+## Soft-target training with temperature-scaled KL divergence.
+## Loads student from Stage 1 best checkpoint.
+##
+## Combined loss: alpha * KL + (1-alpha) * CE
+## Per-language KL tracked for equity analysis.
+##
+## Wayy Research, 2024-2026
+
+stage: "kl_distillation"
+
+teacher:
+  name: "CohereForAI/aya-expanse-8b"
+  dtype: "float16"
+  device_map: "auto"
+
+student:
+  checkpoint: "checkpoints/stage1_alignment/best.pt"
+  config_path: "configs/student.yaml"
+  dtype: "float16"
+
+training:
+  lr: 5.0e-5
+  warmup_steps: 500
+  total_steps: 20000
+  batch_size: 4
+  max_seq_len: 512
+  gradient_accumulation: 8
+  gradient_checkpointing: true
+
+kl:
+  temperature: 2.0
+  alpha: 0.7  # weight on KL vs CE
+
+languages: [en, es, hi, zh, ar, sw, tr, ja, id, te]
+
+output_dir: "checkpoints/stage2_kl"
+seed: 42
