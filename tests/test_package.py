@@ -565,15 +565,15 @@ class TestAccuracyFromPredictions:
 class TestChecklistItems:
     """Tests for CHECKLIST_ITEMS structure."""
 
-    def test_total_count_is_25(self):
+    def test_total_count_is_30(self):
         from aya_distill.eval.checklist import CHECKLIST_ITEMS
 
-        assert len(CHECKLIST_ITEMS) == 25
+        assert len(CHECKLIST_ITEMS) == 30
 
-    def test_seven_categories(self):
+    def test_eight_categories(self):
         from aya_distill.eval.checklist import CATEGORY_NAMES
 
-        assert len(CATEGORY_NAMES) == 7
+        assert len(CATEGORY_NAMES) == 8
         expected = {
             "Evaluation Prompts",
             "Choice of Metrics",
@@ -582,13 +582,14 @@ class TestChecklistItems:
             "Qualitative Insights",
             "Reproducibility",
             "Meta-Evaluation",
+            "Reasoning Evaluation",
         }
         assert set(CATEGORY_NAMES) == expected
 
     def test_all_items_have_checker(self):
         from aya_distill.eval.checklist import CHECKLIST_INDEX
 
-        assert len(CHECKLIST_INDEX) == 25
+        assert len(CHECKLIST_INDEX) == 30
 
     def test_severity_values(self):
         from aya_distill.eval.checklist import CHECKLIST_ITEMS
@@ -601,7 +602,7 @@ class TestValidateResults:
     """Tests for validate_results."""
 
     def _compliant_results(self) -> dict[str, Any]:
-        """Build a fully compliant results dict."""
+        """Build a fully compliant results dict (all 30 items)."""
         per_language: dict[str, Any] = {}
         for code in ("en", "es", "hi", "zh"):
             per_language[code] = {
@@ -627,6 +628,20 @@ class TestValidateResults:
             "family_aggregation": {"Indo-European": 0.85, "Sino-Tibetan": 0.85},
             "variance": 0.001,
             "temperature": 0.0,
+            # Reasoning evaluation data (RE-1 through RE-5)
+            "mean_cot_quality": 0.75,
+            "reasoning": {
+                "en": {
+                    "mathematical": {"cot_quality": 0.8, "n_steps_found": 3},
+                    "causal": {"cot_quality": 0.7, "n_steps_found": 2},
+                },
+                "es": {
+                    "mathematical": {"cot_quality": 0.7, "n_steps_found": 3},
+                    "causal": {"cot_quality": 0.65, "n_steps_found": 2},
+                },
+            },
+            "reasoning_categories": ["mathematical", "causal"],
+            "reasoning_family_scores": {"Indo-European": 0.72},
         }
 
     def test_compliant_results_pass(self):
@@ -648,8 +663,8 @@ class TestValidateResults:
         from aya_distill.eval.checklist import validate_results
 
         report = validate_results(self._compliant_results())
-        assert report.n_total == 25
-        assert report.n_passed + report.n_failed + report.n_manual == 25
+        assert report.n_total == 30
+        assert report.n_passed + report.n_failed + report.n_manual == 30
         assert 0.0 <= report.score <= 1.0
 
     def test_n_passed_property(self):
@@ -673,7 +688,7 @@ class TestValidateResults:
 
         report = validate_results(self._compliant_results())
         summaries = report.category_summaries
-        assert len(summaries) == 7
+        assert len(summaries) == 8
         for s in summaries:
             assert s.n_total > 0
 
@@ -1107,7 +1122,7 @@ class TestIntegration:
 
         report = validate_results(results_dict)
         # Should pass most required items
-        assert report.n_total == 25
+        assert report.n_total == 30
         assert report.score > 0.5
 
     def test_tool_test_round_trip(self):
@@ -1157,3 +1172,552 @@ class TestIntegration:
         assert "es" in degradation
         assert "coherence_delta" in degradation["en"]
         assert "relevance_delta" in degradation["en"]
+
+
+# ===========================================================================
+# 9. Reasoning Tests
+# ===========================================================================
+
+
+class TestCoTScoring:
+    """Tests for chain-of-thought quality scoring."""
+
+    def test_good_cot_response(self):
+        from aya_distill.testing.reasoning import _score_cot_quality
+
+        text = (
+            "Step 1: First, we calculate 4 * 2 = 8.\n"
+            "Step 2: Then, we calculate 5 * 3 = 15.\n"
+            "Step 3: Therefore, the total is 8 + 15 = 23.\n"
+            "#### 23"
+        )
+        score = _score_cot_quality(text)
+        assert score > 0.6, f"Good CoT should score > 0.6, got {score}"
+
+    def test_no_cot_response(self):
+        from aya_distill.testing.reasoning import _score_cot_quality
+
+        score = _score_cot_quality("23")
+        assert score < 0.4, f"Bare answer should score low, got {score}"
+
+    def test_empty_response(self):
+        from aya_distill.testing.reasoning import _score_cot_quality
+
+        assert _score_cot_quality("") == 0.0
+        assert _score_cot_quality("   ") == 0.0
+
+    def test_medium_cot(self):
+        from aya_distill.testing.reasoning import _score_cot_quality
+
+        text = "We need to add the costs. 4 apples cost 8 and 5 oranges cost 15. So the answer is 23."
+        score = _score_cot_quality(text)
+        assert 0.2 < score < 0.9
+
+
+class TestLogicalConsistency:
+    """Tests for logical consistency scoring."""
+
+    def test_progressive_reasoning(self):
+        from aya_distill.testing.reasoning import _score_logical_consistency
+
+        text = (
+            "First, all birds can fly. Second, penguins are birds. "
+            "Therefore, penguins can fly."
+        )
+        score = _score_logical_consistency(text)
+        assert score > 0.6
+
+    def test_contradictory_response(self):
+        from aya_distill.testing.reasoning import _score_logical_consistency
+
+        text = "Yes, penguins can fly. No, penguins cannot fly."
+        score = _score_logical_consistency(text)
+        # Should be penalized for contradiction
+        assert score < 0.7
+
+    def test_neutral_response(self):
+        from aya_distill.testing.reasoning import _score_logical_consistency
+
+        text = "The answer is A."
+        score = _score_logical_consistency(text)
+        assert 0.3 <= score <= 0.7
+
+
+class TestNumericExtraction:
+    """Tests for numeric answer extraction."""
+
+    def test_hash_delimiter(self):
+        from aya_distill.testing.reasoning import _extract_numeric_answer
+
+        assert _extract_numeric_answer("some work...\n#### 23") == "23"
+
+    def test_equals_sign(self):
+        from aya_distill.testing.reasoning import _extract_numeric_answer
+
+        assert _extract_numeric_answer("total = 42") == "42"
+
+    def test_answer_prefix(self):
+        from aya_distill.testing.reasoning import _extract_numeric_answer
+
+        assert _extract_numeric_answer("The answer: 100") == "100"
+
+    def test_fallback_last_number(self):
+        from aya_distill.testing.reasoning import _extract_numeric_answer
+
+        result = _extract_numeric_answer("4 times 2 is 8 plus 15 is 23")
+        assert result == "23"
+
+    def test_no_numbers(self):
+        from aya_distill.testing.reasoning import _extract_numeric_answer
+
+        assert _extract_numeric_answer("no numbers here") is None
+
+
+class TestChoiceExtraction:
+    """Tests for choice answer extraction."""
+
+    def test_answer_prefix(self):
+        from aya_distill.testing.reasoning import _extract_choice_answer
+
+        assert _extract_choice_answer("The answer: A") == "A"
+
+    def test_therefore_prefix(self):
+        from aya_distill.testing.reasoning import _extract_choice_answer
+
+        assert _extract_choice_answer("therefore: B") == "B"
+
+    def test_standalone_letter(self):
+        from aya_distill.testing.reasoning import _extract_choice_answer
+
+        result = _extract_choice_answer("The correct option is C because...")
+        assert result == "C"
+
+    def test_no_choice(self):
+        from aya_distill.testing.reasoning import _extract_choice_answer
+
+        assert _extract_choice_answer("I'm not sure about the answer.") is None
+
+
+class TestReasoningStepCounting:
+    """Tests for counting reasoning steps."""
+
+    def test_numbered_steps(self):
+        from aya_distill.testing.reasoning import _count_reasoning_steps
+
+        text = "1. Calculate 4*2=8\n2. Calculate 5*3=15\n3. Add 8+15=23"
+        assert _count_reasoning_steps(text) >= 3
+
+    def test_connective_steps(self):
+        from aya_distill.testing.reasoning import _count_reasoning_steps
+
+        text = "First we add. Then we multiply. Finally we get the answer."
+        assert _count_reasoning_steps(text) >= 2
+
+    def test_minimal_text(self):
+        from aya_distill.testing.reasoning import _count_reasoning_steps
+
+        assert _count_reasoning_steps("23") >= 0
+
+
+class TestReasoningTestSuite:
+    """Tests for ReasoningTestSuite with mock models."""
+
+    @staticmethod
+    def _cot_model(prompt: str) -> str:
+        return (
+            "Step 1: First, calculate 4 * 2 = 8 for the apples.\n"
+            "Step 2: Then, calculate 5 * 3 = 15 for the oranges.\n"
+            "Step 3: Therefore, the total is 8 + 15 = 23.\n"
+            "#### 23"
+        )
+
+    @staticmethod
+    def _bare_model(prompt: str) -> str:
+        return "23"
+
+    def test_basic_run(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        suite = ReasoningTestSuite(
+            model_fn=self._cot_model,
+            languages=["en", "es"],
+            categories=["mathematical"],
+        )
+        result = suite.run()
+        assert "en" in result.results
+        assert "mathematical" in result.results["en"]
+
+    def test_cot_model_scores_higher(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        cot_suite = ReasoningTestSuite(
+            model_fn=self._cot_model,
+            languages=["en"],
+            categories=["mathematical"],
+        )
+        bare_suite = ReasoningTestSuite(
+            model_fn=self._bare_model,
+            languages=["en"],
+            categories=["mathematical"],
+        )
+
+        cot_result = cot_suite.run()
+        bare_result = bare_suite.run()
+
+        cot_score = cot_result.results["en"]["mathematical"].score
+        bare_score = bare_result.results["en"]["mathematical"].score
+        assert cot_score > bare_score, (
+            f"CoT model ({cot_score}) should score higher than bare ({bare_score})"
+        )
+
+    def test_all_four_categories(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        suite = ReasoningTestSuite(
+            model_fn=self._cot_model,
+            languages=["en"],
+        )
+        result = suite.run()
+        categories = set(result.results["en"].keys())
+        assert categories == {"mathematical", "causal", "analogical", "logical"}
+
+    def test_aggregate_metrics(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        suite = ReasoningTestSuite(
+            model_fn=self._cot_model,
+            languages=["en", "es"],
+            categories=["mathematical"],
+        )
+        result = suite.run()
+        assert result.mean_score > 0
+        assert result.mean_cot_quality > 0
+        assert result.mean_logical_consistency > 0
+        assert isinstance(result.cot_equity_score, float)
+
+    def test_family_scores(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        suite = ReasoningTestSuite(
+            model_fn=self._cot_model,
+            languages=["en", "hi", "tr", "sw"],
+            categories=["mathematical"],
+        )
+        result = suite.run()
+        assert len(result.family_scores) > 0
+
+    def test_summary_string(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        suite = ReasoningTestSuite(
+            model_fn=self._cot_model,
+            languages=["en"],
+            categories=["mathematical"],
+        )
+        result = suite.run()
+        s = result.summary()
+        assert "Multilingual Reasoning Results" in s
+        assert "mathematical" in s
+
+    def test_to_dict_serializable(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        suite = ReasoningTestSuite(
+            model_fn=self._cot_model,
+            languages=["en"],
+            categories=["mathematical"],
+        )
+        result = suite.run()
+        d = result.to_dict()
+        json.dumps(d)
+
+    def test_model_failure_handled(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        def fail(prompt: str) -> str:
+            raise RuntimeError("OOM")
+
+        suite = ReasoningTestSuite(
+            model_fn=fail,
+            languages=["en"],
+            categories=["mathematical"],
+        )
+        result = suite.run()
+        assert "en" in result.results
+        r = result.results["en"]["mathematical"]
+        assert r.score == 0.0
+
+    def test_compare_teacher_student(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        suite = ReasoningTestSuite(
+            model_fn=self._bare_model,
+            languages=["en"],
+            categories=["mathematical"],
+        )
+        degradation = suite.compare(teacher_fn=self._cot_model)
+        assert "en" in degradation
+        assert "mathematical_delta" in degradation["en"]
+
+    def test_causal_reasoning(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        def causal_model(prompt: str) -> str:
+            return (
+                "The road is wet. Since rain causes roads to become wet, "
+                "the most likely cause is rain. Therefore, the answer: A"
+            )
+
+        suite = ReasoningTestSuite(
+            model_fn=causal_model,
+            languages=["en"],
+            categories=["causal"],
+        )
+        result = suite.run()
+        r = result.results["en"]["causal"]
+        assert r.final_answer_correct
+        assert r.cot_quality > 0
+
+    def test_logical_reasoning(self):
+        from aya_distill.testing import ReasoningTestSuite
+
+        def logical_model(prompt: str) -> str:
+            return (
+                "Given that all birds can fly, and penguins are birds, "
+                "therefore penguins can fly. The answer: A"
+            )
+
+        suite = ReasoningTestSuite(
+            model_fn=logical_model,
+            languages=["en"],
+            categories=["logical"],
+        )
+        result = suite.run()
+        r = result.results["en"]["logical"]
+        assert r.final_answer_correct
+        assert r.logical_consistency > 0
+
+
+class TestReasoningFixtures:
+    """Tests for reasoning fixture data."""
+
+    def test_reasoning_scenarios_has_four_categories(self):
+        from aya_distill.testing.fixtures import REASONING_SCENARIOS
+
+        assert set(REASONING_SCENARIOS.keys()) == {
+            "mathematical", "causal", "analogical", "logical"
+        }
+
+    def test_each_category_has_languages(self):
+        from aya_distill.testing.fixtures import REASONING_SCENARIOS
+
+        for cat, scenarios in REASONING_SCENARIOS.items():
+            assert len(scenarios) >= 20, (
+                f"Category {cat} has only {len(scenarios)} languages, expected >= 20"
+            )
+
+    def test_scenarios_have_required_keys(self):
+        from aya_distill.testing.fixtures import REASONING_SCENARIOS
+
+        for cat, scenarios in REASONING_SCENARIOS.items():
+            for lang, scenario in scenarios.items():
+                assert "prompt" in scenario, f"{cat}/{lang} missing 'prompt'"
+                assert "expected_answer" in scenario, f"{cat}/{lang} missing 'expected_answer'"
+                assert "answer_type" in scenario, f"{cat}/{lang} missing 'answer_type'"
+
+    def test_math_answers_are_23(self):
+        from aya_distill.testing.fixtures import REASONING_SCENARIOS
+
+        for lang, scenario in REASONING_SCENARIOS["mathematical"].items():
+            assert scenario["expected_answer"] == "23", (
+                f"Math answer for {lang} should be 23"
+            )
+            assert scenario["answer_type"] == "numeric"
+
+    def test_causal_answers_are_A(self):
+        from aya_distill.testing.fixtures import REASONING_SCENARIOS
+
+        for lang, scenario in REASONING_SCENARIOS["causal"].items():
+            assert scenario["expected_answer"] == "A"
+            assert scenario["answer_type"] == "choice"
+
+    def test_cot_instructions_multilingual(self):
+        from aya_distill.testing.fixtures import _COT_INSTRUCTION
+
+        # Should cover at least 30 languages
+        assert len(_COT_INSTRUCTION) >= 30
+
+    def test_all_categories_same_languages(self):
+        from aya_distill.testing.fixtures import REASONING_SCENARIOS
+
+        langs_per_cat = [
+            set(scenarios.keys())
+            for scenarios in REASONING_SCENARIOS.values()
+        ]
+        # All categories should cover the same language set
+        for i in range(1, len(langs_per_cat)):
+            assert langs_per_cat[0] == langs_per_cat[i]
+
+
+class TestReasoningChecklist:
+    """Tests for reasoning-specific checklist items."""
+
+    def test_checklist_has_30_items(self):
+        from aya_distill.eval.checklist import CHECKLIST_ITEMS
+
+        assert len(CHECKLIST_ITEMS) == 30
+
+    def test_reasoning_category_exists(self):
+        from aya_distill.eval.checklist import CATEGORY_NAMES
+
+        assert "Reasoning Evaluation" in CATEGORY_NAMES
+
+    def test_reasoning_items_count(self):
+        from aya_distill.eval.checklist import CHECKLIST_ITEMS
+
+        reasoning = [i for i in CHECKLIST_ITEMS if i.category == "Reasoning Evaluation"]
+        assert len(reasoning) == 5
+
+    def test_reasoning_required_items(self):
+        from aya_distill.eval.checklist import CHECKLIST_ITEMS
+
+        required = [
+            i for i in CHECKLIST_ITEMS
+            if i.category == "Reasoning Evaluation" and i.required
+        ]
+        assert len(required) == 3  # RE-1, RE-2, RE-3
+
+    def test_reasoning_checklist_ids(self):
+        from aya_distill.eval.checklist import CHECKLIST_INDEX
+
+        for i in range(1, 6):
+            assert f"RE-{i}" in CHECKLIST_INDEX
+
+    def test_validate_with_reasoning_data(self):
+        """Full reasoning results should pass RE-1 through RE-3."""
+        from aya_distill.eval.checklist import validate_results
+
+        results = {
+            "model": "test-model",
+            "seed": 42,
+            "timestamp": "2026-03-07T00:00:00Z",
+            "primary_metric": "reasoning_score",
+            "prompt_template": {
+                "type": "cot",
+                "instruction_language": "native",
+                "n_shot": 0,
+                "version": "1.0",
+            },
+            "per_language": {
+                "en": {"accuracy": 0.8, "ci": {"lower": 0.7, "upper": 0.9}, "n_samples": 100},
+                "es": {"accuracy": 0.75, "ci": {"lower": 0.65, "upper": 0.85}, "n_samples": 100},
+            },
+            "family_aggregation": {"Indo-European": 0.77},
+            "variance": 0.001,
+            "mean_cot_quality": 0.75,
+            "reasoning": {
+                "en": {
+                    "mathematical": {"cot_quality": 0.8, "n_steps_found": 3},
+                    "causal": {"cot_quality": 0.7, "n_steps_found": 2},
+                },
+                "es": {
+                    "mathematical": {"cot_quality": 0.7, "n_steps_found": 3},
+                    "causal": {"cot_quality": 0.65, "n_steps_found": 2},
+                },
+            },
+            "reasoning_categories": ["mathematical", "causal"],
+            "reasoning_family_scores": {"Indo-European": 0.72},
+            "cot_equity_score": 0.002,
+        }
+
+        report = validate_results(results)
+        # Check reasoning items specifically
+        reasoning_results = {
+            r.item.id: r for r in report.results
+            if r.item.id.startswith("RE-")
+        }
+        assert reasoning_results["RE-1"].status.value == "pass"
+        assert reasoning_results["RE-2"].status.value == "pass"
+        assert reasoning_results["RE-3"].status.value == "pass"
+
+    def test_validate_without_reasoning_fails(self):
+        """Missing reasoning data should fail RE-1, RE-2, RE-3."""
+        from aya_distill.eval.checklist import validate_results
+
+        results = {
+            "model": "test-model",
+            "seed": 42,
+            "timestamp": "2026-03-07T00:00:00Z",
+            "primary_metric": "accuracy",
+            "per_language": {"en": {"accuracy": 0.8}},
+        }
+        report = validate_results(results)
+        reasoning_fails = [
+            r for r in report.results
+            if r.item.id.startswith("RE-") and r.item.required and not r.passed
+        ]
+        assert len(reasoning_fails) == 3  # RE-1, RE-2, RE-3
+
+
+class TestReasoningIntegration:
+    """End-to-end: reasoning suite -> checklist validation."""
+
+    def test_reasoning_results_feed_into_checklist(self):
+        from aya_distill.testing import ReasoningTestSuite
+        from aya_distill.eval.checklist import validate_results
+
+        def cot_model(prompt: str) -> str:
+            return (
+                "Step 1: First, 4 * 2 = 8.\n"
+                "Step 2: Then, 5 * 3 = 15.\n"
+                "Step 3: Therefore, 8 + 15 = 23.\n"
+                "#### 23"
+            )
+
+        suite = ReasoningTestSuite(
+            model_fn=cot_model,
+            languages=["en", "es", "hi"],
+            categories=["mathematical", "causal"],
+        )
+        run_result = suite.run()
+
+        # Build checklist-compatible results dict
+        results_dict: dict[str, Any] = {
+            "model": "test-cot-model",
+            "seed": 42,
+            "timestamp": run_result.timestamp,
+            "primary_metric": "reasoning_score",
+            "prompt_template": {
+                "type": "cot",
+                "instruction_language": "native",
+                "n_shot": 0,
+                "version": "1.0",
+            },
+            "per_language": {
+                lang: {
+                    "accuracy": np.mean([r.score for r in cats.values()]),
+                    "ci": {"lower": 0.5, "upper": 0.9},
+                    "n_samples": 4,
+                }
+                for lang, cats in run_result.results.items()
+            },
+            "family_aggregation": run_result.family_scores,
+            "variance": run_result.cot_equity_score,
+            "mean_cot_quality": run_result.mean_cot_quality,
+            "reasoning": {
+                lang: {cat: r.to_dict() for cat, r in cats.items()}
+                for lang, cats in run_result.results.items()
+            },
+            "reasoning_categories": ["mathematical", "causal"],
+            "reasoning_family_scores": run_result.family_scores,
+            "cot_equity_score": run_result.cot_equity_score,
+        }
+
+        report = validate_results(results_dict)
+        # All 3 required reasoning items should pass
+        re_results = {
+            r.item.id: r for r in report.results if r.item.id.startswith("RE-")
+        }
+        assert re_results["RE-1"].passed
+        assert re_results["RE-2"].passed
+        assert re_results["RE-3"].passed

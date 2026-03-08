@@ -215,6 +215,34 @@ CHECKLIST_ITEMS: list[ChecklistItem] = [
         "Metric correlation with human judgment documented",
         "recommended",
     ),
+
+    # -- Category 8: Reasoning Evaluation (5 items) --
+    # Extension by Wayy Research for multilingual reasoning assessment.
+    ChecklistItem(
+        "RE-1", "Reasoning Evaluation",
+        "Chain-of-thought (CoT) quality assessed per language",
+        "required",
+    ),
+    ChecklistItem(
+        "RE-2", "Reasoning Evaluation",
+        "Multiple reasoning categories tested (math, causal, analogical, logical)",
+        "required",
+    ),
+    ChecklistItem(
+        "RE-3", "Reasoning Evaluation",
+        "Reasoning equity across language families documented",
+        "required",
+    ),
+    ChecklistItem(
+        "RE-4", "Reasoning Evaluation",
+        "Step correctness or intermediate answer verification performed",
+        "recommended",
+    ),
+    ChecklistItem(
+        "RE-5", "Reasoning Evaluation",
+        "Cross-lingual reasoning degradation measured (teacher vs student)",
+        "recommended",
+    ),
 ]
 
 # Quick-access index by item ID.
@@ -223,8 +251,8 @@ CHECKLIST_INDEX: dict[str, ChecklistItem] = {item.id: item for item in CHECKLIST
 # Ordered unique category names, preserving definition order.
 CATEGORY_NAMES: list[str] = list(dict.fromkeys(item.category for item in CHECKLIST_ITEMS))
 
-assert len(CHECKLIST_ITEMS) == 25, (
-    f"Expected 25 checklist items (Deja Vu paper), got {len(CHECKLIST_ITEMS)}"
+assert len(CHECKLIST_ITEMS) == 30, (
+    f"Expected 30 checklist items (25 Deja Vu + 5 Reasoning), got {len(CHECKLIST_ITEMS)}"
 )
 
 
@@ -768,6 +796,115 @@ def _check_metric_human_correlation(results: dict[str, Any]) -> tuple[CheckStatu
     return CheckStatus.MANUAL_CHECK_NEEDED, "No human_correlation key; document if available"
 
 
+# -- Reasoning Evaluation checkers ------------------------------------------
+
+
+def _check_cot_quality(results: dict[str, Any]) -> tuple[CheckStatus, str]:
+    """RE-1: Chain-of-thought quality assessed per language."""
+    reasoning = results.get("reasoning") or results.get("reasoning_results")
+    if not reasoning:
+        return CheckStatus.FAIL, "No reasoning/reasoning_results key found"
+    if isinstance(reasoning, dict):
+        # Check for per-language CoT quality scores
+        langs_with_cot: list[str] = []
+        for lang, data in reasoning.items():
+            if isinstance(data, dict):
+                # Could be nested category -> result or flat
+                has_cot = any(
+                    k in data for k in ("cot_quality", "mean_cot_quality")
+                )
+                if has_cot:
+                    langs_with_cot.append(lang)
+                # Check nested categories
+                for v in data.values():
+                    if isinstance(v, dict) and "cot_quality" in v:
+                        langs_with_cot.append(lang)
+                        break
+        if langs_with_cot:
+            return CheckStatus.PASS, f"CoT quality assessed for {len(set(langs_with_cot))} languages"
+    # Check top-level CoT metrics
+    if "mean_cot_quality" in results:
+        return CheckStatus.PASS, f"Mean CoT quality: {results['mean_cot_quality']}"
+    return CheckStatus.FAIL, "No per-language CoT quality scores found in reasoning results"
+
+
+def _check_reasoning_categories(results: dict[str, Any]) -> tuple[CheckStatus, str]:
+    """RE-2: Multiple reasoning categories tested."""
+    reasoning = results.get("reasoning") or results.get("reasoning_results")
+    if not reasoning:
+        return CheckStatus.FAIL, "No reasoning/reasoning_results key found"
+
+    categories: set[str] = set()
+    if isinstance(reasoning, dict):
+        for lang, data in reasoning.items():
+            if isinstance(data, dict):
+                for k in data:
+                    if k in ("mathematical", "causal", "analogical", "logical"):
+                        categories.add(k)
+    # Also check top-level
+    for k in ("reasoning_categories", "categories_tested"):
+        cats = results.get(k)
+        if isinstance(cats, (list, tuple)):
+            categories.update(cats)
+
+    if len(categories) >= 2:
+        return CheckStatus.PASS, f"Reasoning categories tested: {', '.join(sorted(categories))}"
+    if len(categories) == 1:
+        return CheckStatus.FAIL, f"Only 1 reasoning category ({categories.pop()}); need at least 2"
+    return CheckStatus.FAIL, "No reasoning categories detected"
+
+
+def _check_reasoning_equity(results: dict[str, Any]) -> tuple[CheckStatus, str]:
+    """RE-3: Reasoning equity across language families documented."""
+    # Check for family-level reasoning scores
+    family_scores = (
+        results.get("reasoning_family_scores")
+        or results.get("family_scores")
+    )
+    if isinstance(family_scores, dict) and len(family_scores) >= 1:
+        return CheckStatus.PASS, f"Reasoning equity across {len(family_scores)} families"
+
+    equity = results.get("cot_equity_score") or results.get("reasoning_equity")
+    if equity is not None:
+        return CheckStatus.PASS, f"CoT equity score: {equity}"
+
+    return CheckStatus.FAIL, "No reasoning equity / family-level reasoning scores found"
+
+
+def _check_step_correctness(results: dict[str, Any]) -> tuple[CheckStatus, str]:
+    """RE-4: Step correctness or intermediate answer verification."""
+    reasoning = results.get("reasoning") or results.get("reasoning_results")
+    if not reasoning or not isinstance(reasoning, dict):
+        return CheckStatus.MANUAL_CHECK_NEEDED, "No reasoning results to verify step correctness"
+
+    has_steps = False
+    for lang, data in reasoning.items():
+        if isinstance(data, dict):
+            for v in data.values():
+                if isinstance(v, dict) and "n_steps_found" in v:
+                    has_steps = True
+                    break
+            if "n_steps_correct" in data:
+                has_steps = True
+        if has_steps:
+            break
+
+    if has_steps:
+        return CheckStatus.PASS, "Step-level verification present in reasoning results"
+    return CheckStatus.MANUAL_CHECK_NEEDED, "No step-level correctness data; consider adding intermediate checks"
+
+
+def _check_reasoning_degradation(results: dict[str, Any]) -> tuple[CheckStatus, str]:
+    """RE-5: Cross-lingual reasoning degradation measured."""
+    deg = (
+        results.get("reasoning_degradation")
+        or results.get("reasoning_compare")
+    )
+    if deg and isinstance(deg, dict) and len(deg) > 0:
+        return CheckStatus.PASS, f"Reasoning degradation measured for {len(deg)} languages"
+    return CheckStatus.MANUAL_CHECK_NEEDED, "No reasoning degradation data; run compare() between teacher and student"
+
+
 # ---------------------------------------------------------------------------
 # Checker registry -- maps item IDs to validation functions
 # ---------------------------------------------------------------------------
@@ -805,6 +942,12 @@ _CHECKERS: dict[str, _CheckerFn] = {
     # Meta-Evaluation
     "ME-1": _check_benchmark_limitations,
     "ME-2": _check_metric_human_correlation,
+    # Reasoning Evaluation
+    "RE-1": _check_cot_quality,
+    "RE-2": _check_reasoning_categories,
+    "RE-3": _check_reasoning_equity,
+    "RE-4": _check_step_correctness,
+    "RE-5": _check_reasoning_degradation,
 }
 
 # Sanity: every item has a checker.
