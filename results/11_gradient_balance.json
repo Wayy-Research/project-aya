@@ -1,0 +1,115 @@
+{
+  "baseline": {
+    "final_kl": 0.07034471035003662,
+    "final_agreement": 0.009375,
+    "ssm_grad_mean": 0.002051,
+    "moe_grad_mean": 0.053396,
+    "ratio": 0.0384
+  },
+  "lr_strategies": {
+    "uniform_3e-4": {
+      "final_kl": 0.07034471035003662,
+      "final_agreement": 0.009375,
+      "ssm_grad_mean": 0.002051,
+      "moe_grad_mean": 0.053396,
+      "ratio": 0.0384
+    },
+    "ssm_10x": {
+      "final_kl": 0.05239988043904305,
+      "final_agreement": 0.109375,
+      "ssm_grad_mean": 0.015072,
+      "moe_grad_mean": 0.024963,
+      "ratio": 0.6038
+    },
+    "ssm_30x": {
+      "final_kl": 0.05164288431406021,
+      "final_agreement": 0.090625,
+      "ssm_grad_mean": 0.012991,
+      "moe_grad_mean": 0.009604,
+      "ratio": 1.3526
+    }
+  },
+  "gradient_scaling": {
+    "scale_10x": {
+      "final_kl": 0.07034458369016647,
+      "final_agreement": 0.009375,
+      "ssm_grad_mean": 0.020509,
+      "moe_grad_mean": 0.053396,
+      "ratio": 0.3841
+    },
+    "scale_30x": {
+      "final_kl": 0.07034467905759811,
+      "final_agreement": 0.009375,
+      "ssm_grad_mean": 0.061527,
+      "moe_grad_mean": 0.053396,
+      "ratio": 1.1523
+    }
+  },
+  "prenorm_ssm": {
+    "final_kl": 0.0995040625333786,
+    "final_agreement": 0.0,
+    "ssm_grad_mean": 0.000878,
+    "moe_grad_mean": 0.008236,
+    "ratio": 0.1066
+  },
+  "summary": [
+    {
+      "strategy": "baseline (uniform 3e-4)",
+      "final_kl": 0.07034471035003662,
+      "final_agreement": 0.009375,
+      "ssm_grad_mean": 0.002051,
+      "moe_grad_mean": 0.053396,
+      "ratio": 0.0384
+    },
+    {
+      "strategy": "LR ssm_10x",
+      "final_kl": 0.05239988043904305,
+      "final_agreement": 0.109375,
+      "ssm_grad_mean": 0.015072,
+      "moe_grad_mean": 0.024963,
+      "ratio": 0.6038
+    },
+    {
+      "strategy": "LR ssm_30x",
+      "final_kl": 0.05164288431406021,
+      "final_agreement": 0.090625,
+      "ssm_grad_mean": 0.012991,
+      "moe_grad_mean": 0.009604,
+      "ratio": 1.3526
+    },
+    {
+      "strategy": "Grad scale_10x",
+      "final_kl": 0.07034458369016647,
+      "final_agreement": 0.009375,
+      "ssm_grad_mean": 0.020509,
+      "moe_grad_mean": 0.053396,
+      "ratio": 0.3841
+    },
+    {
+      "strategy": "Grad scale_30x",
+      "final_kl": 0.07034467905759811,
+      "final_agreement": 0.009375,
+      "ssm_grad_mean": 0.061527,
+      "moe_grad_mean": 0.053396,
+      "ratio": 1.1523
+    },
+    {
+      "strategy": "PreNorm SSM",
+      "final_kl": 0.0995040625333786,
+      "final_agreement": 0.0,
+      "ssm_grad_mean": 0.000878,
+      "moe_grad_mean": 0.008236,
+      "ratio": 0.1066
+    }
+  ],
+  "config": {
+    "vocab_size": 5000,
+    "seq_len": 32,
+    "batch_size": 4,
+    "n_steps": 200,
+    "teacher_d_model": 256,
+    "teacher_layers": 4,
+    "teacher_params": 4439040,
+    "seed": 42
+  }
+}

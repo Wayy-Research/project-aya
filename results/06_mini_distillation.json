@@ -1,0 +1,66 @@
+{
+  "experiment": "mini_distillation",
+  "block_conversion": {
+    "teacher_hidden": 512,
+    "student_d_model": 256,
+    "n_layers": 8,
+    "mean_initial_cka": 0.994,
+    "mean_final_cka": 0.9923,
+    "per_layer": [
+      {
+        "layer": 0,
+        "initial": 0.9846,
+        "final": 0.9813
+      },
+      {
+        "layer": 1,
+        "initial": 0.991,
+        "final": 0.9886
+      },
+      {
+        "layer": 2,
+        "initial": 0.995,
+        "final": 0.9899
+      },
+      {
+        "layer": 3,
+        "initial": 0.9951,
+        "final": 0.9959
+      },
+      {
+        "layer": 4,
+        "initial": 0.9961,
+        "final": 0.9959
+      },
+      {
+        "layer": 5,
+        "initial": 0.9972,
+        "final": 0.9946
+      },
+      {
+        "layer": 6,
+        "initial": 0.9967,
+        "final": 0.9956
+      },
+      {
+        "layer": 7,
+        "initial": 0.9967,
+        "final": 0.9966
+      }
+    ]
+  },
+  "kl_distillation": {
+    "teacher_params": 3209728,
+    "student_params": 930560,
+    "compression": 3.4,
+    "temperature": 2.0,
+    "alpha": 0.7,
+    "steps": 1000,
+    "final_kl": 0.0232,
+    "final_ce": 6.9754,
+    "final_ppl": 1070.0,
+    "top1_agreement": 13.4,
+    "top5_agreement": 82.1,
+    "mean_cosine_sim": -0.0481
+  }
+}

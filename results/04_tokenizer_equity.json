@@ -1,0 +1,773 @@
+{
+  "model": "CohereLabs/tiny-aya-global",
+  "vocab_size": 261000,
+  "n_languages": 67,
+  "n_prompt_categories": 1,
+  "fertility": {
+    "median": 0.3333,
+    "mean": 0.3527,
+    "std": 0.1175,
+    "max": {
+      "language": "Amharic",
+      "value": 0.8571
+    },
+    "min": {
+      "language": "Indonesian",
+      "value": 0.1961
+    },
+    "max_min_ratio": 4.4
+  },
+  "statistical_tests": {
+    "kruskal_wallis_resource": {
+      "H": 12.2136,
+      "p": 0.002228
+    },
+    "kruskal_wallis_script": {
+      "H": 7.9554,
+      "p": 0.046943
+    },
+    "spearman_resource_fertility": {
+      "rho": -0.3923,
+      "p": 0.001027
+    }
+  },
+  "per_language": [
+    {
+      "code": "am",
+      "language": "Amharic",
+      "family": "Afroasiatic",
+      "script": "Ethiopic",
+      "resources": "low",
+      "fertility": 0.8571,
+      "bytes_per_token": 3.0833,
+      "cost_multiplier": 4.027725563909774,
+      "sampling_weight": 2.5715571557155714
+    },
+    {
+      "code": "zh",
+      "language": "Chinese",
+      "family": "Sino-Tibetan",
+      "script": "CJK",
+      "resources": "high",
+      "fertility": 0.6429,
+      "bytes_per_token": 4.6667,
+      "cost_multiplier": 3.021146616541354,
+      "sampling_weight": 1.928892889288929
+    },
+    {
+      "code": "yo",
+      "language": "Yoruba",
+      "family": "Niger-Congo",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.6136,
+      "bytes_per_token": 2.5185,
+      "cost_multiplier": 2.8834586466165417,
+      "sampling_weight": 1.8409840984098411
+    },
+    {
+      "code": "lo",
+      "language": "Lao",
+      "family": "Kra-Dai",
+      "script": "Lao",
+      "resources": "low",
+      "fertility": 0.6,
+      "bytes_per_token": 4.9167,
+      "cost_multiplier": 2.819548872180451,
+      "sampling_weight": 1.8001800180018002
+    },
+    {
+      "code": "ja",
+      "language": "Japanese",
+      "family": "Japonic",
+      "script": "CJK+Kana",
+      "resources": "high",
+      "fertility": 0.5714,
+      "bytes_per_token": 5.25,
+      "cost_multiplier": 2.68515037593985,
+      "sampling_weight": 1.7143714371437144
+    },
+    {
+      "code": "ko",
+      "language": "Korean",
+      "family": "Koreanic",
+      "script": "Hangul",
+      "resources": "high",
+      "fertility": 0.5417,
+      "bytes_per_token": 4.6154,
+      "cost_multiplier": 2.5455827067669174,
+      "sampling_weight": 1.6252625262526252
+    },
+    {
+      "code": "pa",
+      "language": "Punjabi",
+      "family": "Indo-European",
+      "script": "Gurmukhi",
+      "resources": "low",
+      "fertility": 0.5,
+      "bytes_per_token": 5.3333,
+      "cost_multiplier": 2.349624060150376,
+      "sampling_weight": 1.5001500150015001
+    },
+    {
+      "code": "gu",
+      "language": "Gujarati",
+      "family": "Indo-European",
+      "script": "Gujarati",
+      "resources": "low",
+      "fertility": 0.4773,
+      "bytes_per_token": 5.8095,
+      "cost_multiplier": 2.242951127819549,
+      "sampling_weight": 1.432043204320432
+    },
+    {
+      "code": "cy",
+      "language": "Welsh",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.4444,
+      "bytes_per_token": 2.25,
+      "cost_multiplier": 2.088345864661654,
+      "sampling_weight": 1.3333333333333335
+    },
+    {
+      "code": "wo",
+      "language": "Wolof",
+      "family": "Niger-Congo",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.4444,
+      "bytes_per_token": 2.3125,
+      "cost_multiplier": 2.088345864661654,
+      "sampling_weight": 1.3333333333333335
+    },
+    {
+      "code": "km",
+      "language": "Khmer",
+      "family": "Austroasiatic",
+      "script": "Khmer",
+      "resources": "low",
+      "fertility": 0.4222,
+      "bytes_per_token": 7.1053,
+      "cost_multiplier": 1.9840225563909777,
+      "sampling_weight": 1.2667266726672668
+    },
+    {
+      "code": "ne",
+      "language": "Nepali",
+      "family": "Indo-European",
+      "script": "Devanagari",
+      "resources": "low",
+      "fertility": 0.4211,
+      "bytes_per_token": 6.7083,
+      "cost_multiplier": 1.9788533834586466,
+      "sampling_weight": 1.2634263426342633
+    },
+    {
+      "code": "my",
+      "language": "Burmese",
+      "family": "Sino-Tibetan",
+      "script": "Myanmar",
+      "resources": "low",
+      "fertility": 0.4194,
+      "bytes_per_token": 6.9231,
+      "cost_multiplier": 1.9708646616541354,
+      "sampling_weight": 1.2583258325832585
+    },
+    {
+      "code": "mr",
+      "language": "Marathi",
+      "family": "Indo-European",
+      "script": "Devanagari",
+      "resources": "medium",
+      "fertility": 0.4182,
+      "bytes_per_token": 6.6522,
+      "cost_multiplier": 1.9652255639097747,
+      "sampling_weight": 1.2547254725472547
+    },
+    {
+      "code": "he",
+      "language": "Hebrew",
+      "family": "Afroasiatic",
+      "script": "Hebrew",
+      "resources": "medium",
+      "fertility": 0.4167,
+      "bytes_per_token": 4.4,
+      "cost_multiplier": 1.9581766917293235,
+      "sampling_weight": 1.2502250225022504
+    },
+    {
+      "code": "te",
+      "language": "Telugu",
+      "family": "Dravidian",
+      "script": "Telugu",
+      "resources": "medium",
+      "fertility": 0.413,
+      "bytes_per_token": 6.7368,
+      "cost_multiplier": 1.9407894736842106,
+      "sampling_weight": 1.2391239123912392
+    },
+    {
+      "code": "ha",
+      "language": "Hausa",
+      "family": "Afroasiatic",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.4082,
+      "bytes_per_token": 2.5,
+      "cost_multiplier": 1.918233082706767,
+      "sampling_weight": 1.2247224722472247
+    },
+    {
+      "code": "mt",
+      "language": "Maltese",
+      "family": "Afroasiatic",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.4043,
+      "bytes_per_token": 2.6316,
+      "cost_multiplier": 1.8999060150375942,
+      "sampling_weight": 1.213021302130213
+    },
+    {
+      "code": "hi",
+      "language": "Hindi",
+      "family": "Indo-European",
+      "script": "Devanagari",
+      "resources": "high",
+      "fertility": 0.4,
+      "bytes_per_token": 6.8,
+      "cost_multiplier": 1.879699248120301,
+      "sampling_weight": 1.2001200120012003
+    },
+    {
+      "code": "sn",
+      "language": "Shona",
+      "family": "Niger-Congo",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.3774,
+      "bytes_per_token": 2.65,
+      "cost_multiplier": 1.773496240601504,
+      "sampling_weight": 1.1323132313231323
+    },
+    {
+      "code": "ga",
+      "language": "Irish",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.3774,
+      "bytes_per_token": 2.85,
+      "cost_multiplier": 1.773496240601504,
+      "sampling_weight": 1.1323132313231323
+    },
+    {
+      "code": "ig",
+      "language": "Igbo",
+      "family": "Niger-Congo",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.375,
+      "bytes_per_token": 2.9333,
+      "cost_multiplier": 1.762218045112782,
+      "sampling_weight": 1.125112511251125
+    },
+    {
+      "code": "xh",
+      "language": "Xhosa",
+      "family": "Niger-Congo",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.3673,
+      "bytes_per_token": 2.7222,
+      "cost_multiplier": 1.7260338345864663,
+      "sampling_weight": 1.102010201020102
+    },
+    {
+      "code": "pl",
+      "language": "Polish",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.3556,
+      "bytes_per_token": 3.0,
+      "cost_multiplier": 1.6710526315789476,
+      "sampling_weight": 1.066906690669067
+    },
+    {
+      "code": "ar",
+      "language": "Arabic",
+      "family": "Afroasiatic",
+      "script": "Arabic",
+      "resources": "high",
+      "fertility": 0.3529,
+      "bytes_per_token": 5.25,
+      "cost_multiplier": 1.6583646616541354,
+      "sampling_weight": 1.058805880588059
+    },
+    {
+      "code": "th",
+      "language": "Thai",
+      "family": "Kra-Dai",
+      "script": "Thai",
+      "resources": "medium",
+      "fertility": 0.35,
+      "bytes_per_token": 8.5714,
+      "cost_multiplier": 1.644736842105263,
+      "sampling_weight": 1.05010501050105
+    },
+    {
+      "code": "da",
+      "language": "Danish",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.3488,
+      "bytes_per_token": 2.8667,
+      "cost_multiplier": 1.6390977443609023,
+      "sampling_weight": 1.0465046504650466
+    },
+    {
+      "code": "sw",
+      "language": "Swahili",
+      "family": "Niger-Congo",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.3415,
+      "bytes_per_token": 2.9286,
+      "cost_multiplier": 1.604793233082707,
+      "sampling_weight": 1.0246024602460246
+    },
+    {
+      "code": "ur",
+      "language": "Urdu",
+      "family": "Indo-European",
+      "script": "Arabic",
+      "resources": "medium",
+      "fertility": 0.3409,
+      "bytes_per_token": 5.2667,
+      "cost_multiplier": 1.6019736842105263,
+      "sampling_weight": 1.0228022802280228
+    },
+    {
+      "code": "bn",
+      "language": "Bengali",
+      "family": "Indo-European",
+      "script": "Bengali",
+      "resources": "medium",
+      "fertility": 0.3404,
+      "bytes_per_token": 8.1875,
+      "cost_multiplier": 1.599624060150376,
+      "sampling_weight": 1.0213021302130212
+    },
+    {
+      "code": "sr",
+      "language": "Serbian",
+      "family": "Indo-European",
+      "script": "Cyrillic",
+      "resources": "medium",
+      "fertility": 0.34,
+      "bytes_per_token": 5.5882,
+      "cost_multiplier": 1.597744360902256,
+      "sampling_weight": 1.0201020102010203
+    },
+    {
+      "code": "lv",
+      "language": "Latvian",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.3393,
+      "bytes_per_token": 3.2105,
+      "cost_multiplier": 1.594454887218045,
+      "sampling_weight": 1.018001800180018
+    },
+    {
+      "code": "fa",
+      "language": "Persian",
+      "family": "Indo-European",
+      "script": "Arabic",
+      "resources": "medium",
+      "fertility": 0.3333,
+      "bytes_per_token": 5.3846,
+      "cost_multiplier": 1.5662593984962405,
+      "sampling_weight": 1.0
+    },
+    {
+      "code": "ta",
+      "language": "Tamil",
+      "family": "Dravidian",
+      "script": "Tamil",
+      "resources": "medium",
+      "fertility": 0.3333,
+      "bytes_per_token": 8.3333,
+      "cost_multiplier": 1.5662593984962405,
+      "sampling_weight": 1.0
+    },
+    {
+      "code": "hu",
+      "language": "Hungarian",
+      "family": "Uralic",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.3273,
+      "bytes_per_token": 3.3333,
+      "cost_multiplier": 1.538063909774436,
+      "sampling_weight": 0.9819981998199819
+    },
+    {
+      "code": "no",
+      "language": "Norwegian",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.3256,
+      "bytes_per_token": 3.0714,
+      "cost_multiplier": 1.5300751879699248,
+      "sampling_weight": 0.976897689768977
+    },
+    {
+      "code": "zu",
+      "language": "Zulu",
+      "family": "Niger-Congo",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.325,
+      "bytes_per_token": 3.0769,
+      "cost_multiplier": 1.5272556390977445,
+      "sampling_weight": 0.9750975097509752
+    },
+    {
+      "code": "bg",
+      "language": "Bulgarian",
+      "family": "Indo-European",
+      "script": "Cyrillic",
+      "resources": "medium",
+      "fertility": 0.3137,
+      "bytes_per_token": 5.9375,
+      "cost_multiplier": 1.4741541353383458,
+      "sampling_weight": 0.9411941194119412
+    },
+    {
+      "code": "ru",
+      "language": "Russian",
+      "family": "Indo-European",
+      "script": "Cyrillic",
+      "resources": "high",
+      "fertility": 0.3125,
+      "bytes_per_token": 6.0667,
+      "cost_multiplier": 1.468515037593985,
+      "sampling_weight": 0.9375937593759376
+    },
+    {
+      "code": "el",
+      "language": "Greek",
+      "family": "Indo-European",
+      "script": "Greek",
+      "resources": "medium",
+      "fertility": 0.3125,
+      "bytes_per_token": 5.8667,
+      "cost_multiplier": 1.468515037593985,
+      "sampling_weight": 0.9375937593759376
+    },
+    {
+      "code": "sv",
+      "language": "Swedish",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.3111,
+      "bytes_per_token": 3.2857,
+      "cost_multiplier": 1.461936090225564,
+      "sampling_weight": 0.9333933393339334
+    },
+    {
+      "code": "mg",
+      "language": "Malagasy",
+      "family": "Austronesian",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.3091,
+      "bytes_per_token": 3.2941,
+      "cost_multiplier": 1.4525375939849625,
+      "sampling_weight": 0.9273927392739274
+    },
+    {
+      "code": "ro",
+      "language": "Romanian",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.3077,
+      "bytes_per_token": 3.4375,
+      "cost_multiplier": 1.4459586466165413,
+      "sampling_weight": 0.9231923192319231
+    },
+    {
+      "code": "lt",
+      "language": "Lithuanian",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.3019,
+      "bytes_per_token": 3.625,
+      "cost_multiplier": 1.418703007518797,
+      "sampling_weight": 0.9057905790579058
+    },
+    {
+      "code": "uk",
+      "language": "Ukrainian",
+      "family": "Indo-European",
+      "script": "Cyrillic",
+      "resources": "medium",
+      "fertility": 0.2979,
+      "bytes_per_token": 6.3571,
+      "cost_multiplier": 1.3999060150375942,
+      "sampling_weight": 0.8937893789378938
+    },
+    {
+      "code": "tr",
+      "language": "Turkish",
+      "family": "Turkic",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2979,
+      "bytes_per_token": 3.7857,
+      "cost_multiplier": 1.3999060150375942,
+      "sampling_weight": 0.8937893789378938
+    },
+    {
+      "code": "eu",
+      "language": "Basque",
+      "family": "Language isolate",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.2955,
+      "bytes_per_token": 3.3846,
+      "cost_multiplier": 1.3886278195488722,
+      "sampling_weight": 0.8865886588658866
+    },
+    {
+      "code": "et",
+      "language": "Estonian",
+      "family": "Uralic",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.2941,
+      "bytes_per_token": 3.5333,
+      "cost_multiplier": 1.3820488721804511,
+      "sampling_weight": 0.8823882388238824
+    },
+    {
+      "code": "ca",
+      "language": "Catalan",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2745,
+      "bytes_per_token": 3.6429,
+      "cost_multiplier": 1.2899436090225567,
+      "sampling_weight": 0.8235823582358237
+    },
+    {
+      "code": "gl",
+      "language": "Galician",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.2745,
+      "bytes_per_token": 3.6429,
+      "cost_multiplier": 1.2899436090225567,
+      "sampling_weight": 0.8235823582358237
+    },
+    {
+      "code": "fi",
+      "language": "Finnish",
+      "family": "Uralic",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2708,
+      "bytes_per_token": 3.8462,
+      "cost_multiplier": 1.2725563909774436,
+      "sampling_weight": 0.8124812481248125
+    },
+    {
+      "code": "cs",
+      "language": "Czech",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2708,
+      "bytes_per_token": 3.8462,
+      "cost_multiplier": 1.2725563909774436,
+      "sampling_weight": 0.8124812481248125
+    },
+    {
+      "code": "sl",
+      "language": "Slovenian",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2642,
+      "bytes_per_token": 3.8571,
+      "cost_multiplier": 1.2415413533834587,
+      "sampling_weight": 0.7926792679267927
+    },
+    {
+      "code": "jv",
+      "language": "Javanese",
+      "family": "Austronesian",
+      "script": "Latin",
+      "resources": "low",
+      "fertility": 0.2593,
+      "bytes_per_token": 3.8571,
+      "cost_multiplier": 1.2185150375939848,
+      "sampling_weight": 0.7779777977797779
+    },
+    {
+      "code": "sk",
+      "language": "Slovak",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2549,
+      "bytes_per_token": 4.0769,
+      "cost_multiplier": 1.1978383458646618,
+      "sampling_weight": 0.7647764776477649
+    },
+    {
+      "code": "vi",
+      "language": "Vietnamese",
+      "family": "Austroasiatic",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2545,
+      "bytes_per_token": 5.3571,
+      "cost_multiplier": 1.1959586466165415,
+      "sampling_weight": 0.7635763576357636
+    },
+    {
+      "code": "tl",
+      "language": "Tagalog",
+      "family": "Austronesian",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2545,
+      "bytes_per_token": 3.9286,
+      "cost_multiplier": 1.1959586466165415,
+      "sampling_weight": 0.7635763576357636
+    },
+    {
+      "code": "fr",
+      "language": "French",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "high",
+      "fertility": 0.2453,
+      "bytes_per_token": 4.1538,
+      "cost_multiplier": 1.1527255639097744,
+      "sampling_weight": 0.735973597359736
+    },
+    {
+      "code": "it",
+      "language": "Italian",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "high",
+      "fertility": 0.24,
+      "bytes_per_token": 4.25,
+      "cost_multiplier": 1.1278195488721805,
+      "sampling_weight": 0.7200720072007201
+    },
+    {
+      "code": "pt",
+      "language": "Portuguese",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "high",
+      "fertility": 0.2353,
+      "bytes_per_token": 4.25,
+      "cost_multiplier": 1.105733082706767,
+      "sampling_weight": 0.705970597059706
+    },
+    {
+      "code": "nl",
+      "language": "Dutch",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "high",
+      "fertility": 0.2333,
+      "bytes_per_token": 4.2857,
+      "cost_multiplier": 1.0963345864661656,
+      "sampling_weight": 0.6999699969997
+    },
+    {
+      "code": "hr",
+      "language": "Croatian",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2308,
+      "bytes_per_token": 4.4167,
+      "cost_multiplier": 1.0845864661654137,
+      "sampling_weight": 0.6924692469246925
+    },
+    {
+      "code": "ms",
+      "language": "Malay",
+      "family": "Austronesian",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.2222,
+      "bytes_per_token": 4.5,
+      "cost_multiplier": 1.044172932330827,
+      "sampling_weight": 0.6666666666666667
+    },
+    {
+      "code": "de",
+      "language": "German",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "high",
+      "fertility": 0.2143,
+      "bytes_per_token": 4.75,
+      "cost_multiplier": 1.0070488721804511,
+      "sampling_weight": 0.6429642964296429
+    },
+    {
+      "code": "en",
+      "language": "English",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "high",
+      "fertility": 0.2128,
+      "bytes_per_token": 4.7,
+      "cost_multiplier": 1.0,
+      "sampling_weight": 0.6384638463846385
+    },
+    {
+      "code": "es",
+      "language": "Spanish",
+      "family": "Indo-European",
+      "script": "Latin",
+      "resources": "high",
+      "fertility": 0.2037,
+      "bytes_per_token": 5.0,
+      "cost_multiplier": 0.9572368421052632,
+      "sampling_weight": 0.6111611161116112
+    },
+    {
+      "code": "id",
+      "language": "Indonesian",
+      "family": "Austronesian",
+      "script": "Latin",
+      "resources": "medium",
+      "fertility": 0.1961,
+      "bytes_per_token": 5.1,
+      "cost_multiplier": 0.9215225563909775,
+      "sampling_weight": 0.5883588358835884
+    }
+  ]
+}

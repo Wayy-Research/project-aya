@@ -1,0 +1,122 @@
+{
+  "temperature_sweep": {
+    "0.5": {
+      "final_kl": 0.032807755097746846,
+      "final_agreement": 0.26884765625
+    },
+    "1.0": {
+      "final_kl": 0.033209798857569695,
+      "final_agreement": 0.2630859375
+    },
+    "2.0": {
+      "final_kl": 0.0328450626693666,
+      "final_agreement": 0.24716796875
+    },
+    "4.0": {
+      "final_kl": 0.032749286759644745,
+      "final_agreement": 0.21748046875
+    },
+    "8.0": {
+      "final_kl": 0.03323792656883597,
+      "final_agreement": 0.191796875
+    }
+  },
+  "alpha_sweep": {
+    "0.1": {
+      "final_kl": 0.11456098295748234,
+      "final_ce": 8.574148178100586,
+      "final_agreement": 0.0001953125
+    },
+    "0.3": {
+      "final_kl": 0.1090115386992693,
+      "final_ce": 8.571600914001465,
+      "final_agreement": 0.00048828125
+    },
+    "0.5": {
+      "final_kl": 0.09333483092486858,
+      "final_ce": 8.568075180053711,
+      "final_agreement": 0.0015625
+    },
+    "0.7": {
+      "final_kl": 0.0328450626693666,
+      "final_ce": 8.545520782470703,
+      "final_agreement": 0.24716796875
+    },
+    "0.9": {
+      "final_kl": 0.020981438178569078,
+      "final_ce": 8.554749488830566,
+      "final_agreement": 0.2609375
+    }
+  },
+  "capacity_scaling": {
+    "tiny": {
+      "params": 1047552,
+      "compression": 14.48,
+      "final_kl": 0.05788972675800323,
+      "final_agreement": 0.07958984375
+    },
+    "small": {
+      "params": 4482560,
+      "compression": 3.38,
+      "final_kl": 0.03337886817753315,
+      "final_agreement": 0.26806640625
+    },
+    "medium": {
+      "params": 8444416,
+      "compression": 1.8,
+      "final_kl": 0.03356346096843481,
+      "final_agreement": 0.10361328125
+    }
+  },
+  "lr_sweep": {
+    "1e-04": {
+      "final_kl": 0.07847427763044834,
+      "final_agreement": 0.035546875
+    },
+    "3e-04": {
+      "final_kl": 0.0328450626693666,
+      "final_agreement": 0.24716796875
+    },
+    "1e-03": {
+      "final_kl": 0.031203268375247718,
+      "final_agreement": 0.2359375
+    },
+    "3e-03": {
+      "final_kl": 0.03358742408454418,
+      "final_agreement": 0.21025390625
+    }
+  },
+  "gradient_analysis": {
+    "embedding": {
+      "mean": 0.242306,
+      "std": 0.031226,
+      "max": 0.310326
+    },
+    "ssm": {
+      "mean": 0.00362,
+      "std": 0.001075,
+      "max": 0.00623
+    },
+    "moe": {
+      "mean": 0.032757,
+      "std": 0.016841,
+      "max": 0.068628
+    },
+    "lm_head": {
+      "mean": 0.242306,
+      "std": 0.031226,
+      "max": 0.310326
+    },
+    "ssm_moe_ratio_mean": 0.1541
+  },
+  "config": {
+    "vocab_size": 5000,
+    "seq_len": 64,
+    "batch_size": 8,
+    "n_steps": 200,
+    "teacher_d_model": 512,
+    "teacher_layers": 4,
+    "teacher_params": 15169536,
+    "seed": 42
+  }
+}

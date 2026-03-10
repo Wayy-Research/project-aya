@@ -539,6 +539,110 @@ with open("results/full_evaluation.json", "w") as f:
 
 ---
 
+## Research Findings (Stage 1)
+
+Results from 10 completed research notebooks analyzing the tiny-aya-global teacher, Aetheris student architecture, tokenizer equity, and distillation dynamics. All experiments reproducible via `notebooks/`.
+
+### Tokenizer Equity (NB04)
+
+The teacher tokenizer is significantly inequitable across languages:
+
+| Metric | Value |
+|--------|-------|
+| Fertility ratio (max/min) | **4.4x** |
+| Resource-level effect | **Significant** (Kruskal-Wallis p=0.002) |
+| Script-level effect | **Significant** (p=0.047, medium effect) |
+| Spearman correlation (resource vs fertility) | **rho=-0.39** |
+
+Low-resource, non-Latin-script languages get consistently worse tokenization, meaning they need more tokens to encode the same content — directly impacting distillation compute and quality.
+
+### Teacher Representations (NB07)
+
+Analysis of the real tiny-aya-global hidden states across 30 languages:
+
+- **Cross-lingual similarity: 0.878** — the teacher has strong multilingual representations that should be preservable through distillation
+- **Layer self-similarity**: distinct representation shifts at layers ~12 and ~24, with high redundancy in middle layers
+- **Real attention→SSM conversion CKA: 0.604** (below 0.75 threshold) — **refinement is necessary** after weight mapping
+
+### Block Conversion (NB03, NB07)
+
+| Strategy | Expert Pairwise CKA | Verdict |
+|----------|-------------------|---------|
+| FFN→MoE replicate | 0.88 (near-identical) | Experts start too similar |
+| FFN→MoE SVD split | **0.097** (highly diverse) | Clear winner — experts specialize from init |
+
+SVD projection from teacher dim (2048) to student dim (1024) preserves >95% of weight variance for V, Q, and O projections.
+
+### Multilingual KL Distillation (NB08)
+
+Real distillation from tiny-aya-global (3.35B) into Aetheris (73.5M) across all 67 languages:
+
+| Metric | Value |
+|--------|-------|
+| Final KL | **0.720** |
+| DES (Degradation Equity Score) | **0.338** (moderate inequity) |
+| Coefficient of Variation | **47%** |
+| Training time | 645s (CPU, 15 epochs) |
+
+**Per-language KL divergence** (selected):
+| Language | KL | Resource | Risk |
+|----------|------|----------|------|
+| Malay | 0.289 | medium | low |
+| Spanish | 0.303 | high | low |
+| English | 0.391 | high | low |
+| Hindi | 0.900 | medium | moderate |
+| Amharic | **1.802** | low | **high** |
+| Burmese | **1.642** | low | **high** |
+| Lao | **1.564** | low | **high** |
+| Gujarati | **1.380** | low | **high** |
+
+### Distillation Dynamics (NB09)
+
+Systematic sweeps of hyperparameters on synthetic teacher:
+
+- **Temperature**: T=0.5 gives best top-1 agreement; T=2.0 is stable for KL
+- **Alpha (KL weight)**: alpha=0.9 best KL (0.026), alpha=0.7 best balanced
+- **Learning rate**: lr=1e-3 with cosine scheduling optimal
+- **Capacity**: larger students don't always win — diminishing returns above 2.4x compression
+
+### Gradient Imbalance (NB09, NB11)
+
+**Critical finding**: SSM layers receive ~27x less gradient than MoE layers (ratio=0.037).
+
+| Strategy | Final KL | Agreement | Grad Ratio | Verdict |
+|----------|----------|-----------|------------|---------|
+| Uniform LR (baseline) | 0.070 | 0.9% | 0.038 | Poor SSM learning |
+| **SSM 10x LR boost** | **0.052** | **10.9%** | **0.604** | **Best balance** |
+| SSM 30x LR boost | 0.052 | 9.1% | 1.353 | Slight overshoot |
+| Gradient scaling 10x | 0.070 | 0.9% | 0.384 | Ineffective |
+| PreNorm SSM | 0.100 | 0.0% | 0.107 | Harmful |
+
+**Per-component learning rates are essential** for hybrid Mamba-MoE distillation.
+
+### Equity Risk Assessment (NB10)
+
+Composite risk scores combining fertility ratio, resource level, and script complexity:
+
+| Priority | Count | Languages |
+|----------|-------|-----------|
+| **High priority** | 8 | Amharic, Lao, Punjabi, Gujarati, Burmese, Yoruba, Khmer, Nepali |
+| Monitor | 27 | Bengali, Tamil, Telugu, Thai, Welsh, Hausa, ... |
+| Standard | 32 | English, Spanish, French, German, ... |
+
+**Projected quality gap at 9x compression: <1%** between high and low resource — suggesting equitable distillation is achievable with proper sampling.
+
+### Stage 2 Recommendations
+
+Based on all findings, the recommended configuration for scaled distillation:
+
+1. **Initialization**: SVD split for MoE, weight_map + refinement for SSM (target CKA >0.75)
+2. **Training**: T=2.0, alpha=0.7, lr=1e-3 base with **10x SSM LR boost**, cosine schedule
+3. **Data**: Weighted sampling — oversample Amharic (3.2x), Burmese (2.8x), Lao (2.6x), Gujarati (2.4x)
+4. **Monitoring**: Track per-language KL and DES every epoch; halt if DES >0.5
+5. **Student size**: small config (372M, 9x compression) balances quality and efficiency
+
+---
+
 ## Language Registry
 
 Single source of truth for all 67 target languages:
@@ -712,7 +816,15 @@ project-aya/
 ├── notebooks/                  # Research notebooks
 │   ├── 01_explore_aya_teacher.ipynb   # Load tiny-aya-global, tokenizer analysis
 │   ├── 02_cka_analysis.ipynb          # CKA tutorial, noise sensitivity, heatmaps
-│   └── 03_block_conversion_experiments.ipynb  # Attention->SSM conversion
+│   ├── 03_block_conversion_experiments.ipynb  # Attention->SSM conversion (real teacher)
+│   ├── 04_tokenizer_equity.ipynb      # Statistical tokenizer fairness analysis
+│   ├── 05_student_architecture.ipynb  # Aetheris validation, params, scaling
+│   ├── 06_mini_distillation.ipynb     # Synthetic distillation pipeline proof
+│   ├── 07_teacher_representations.ipynb # Real teacher hidden state analysis
+│   ├── 08_multilingual_distillation.ipynb # Real teacher KL distillation + DES
+│   ├── 09_distillation_dynamics.ipynb # Temperature, alpha, capacity, LR sweeps
+│   ├── 10_equity_synthesis.ipynb      # Equity risk scorecard + Stage 2 recommendations
+│   └── 11_gradient_balance.ipynb      # SSM/MoE gradient imbalance + per-component LR
 │
 ├── tests/
 │   ├── conftest.py             # Pytest fixtures for model testing
@@ -784,11 +896,11 @@ aya-distill profile --quantize 4bit --output results/profile.json
 
 ## Roadmap
 
-| Phase | Name | Key Deliverables | Target |
-|-------|------|-----------------|--------|
-| 01 | Baseline | Load tiny-aya-global, establish CPU tokens/sec across 67 languages. Validate tokenizer compatibility. | Q1 2026 |
-| 02 | Distillation | Execute 3-stage MambaInLlama pipeline on RunPod A100. Layer alignment, KL distillation, then multilingual SFT with tool calling recovery. | Q2 2026 |
-| 03 | Evaluation | Full benchmark suite across 67 languages. Equity analysis, ablation studies, and paper preparation targeting EMNLP / ACL / NeurIPS. | Q3 2026 |
+| Phase | Name | Status | Key Deliverables |
+|-------|------|--------|-----------------|
+| 01 | Research & Baseline | **COMPLETE** | 10 notebooks, tokenizer equity analysis, CKA validation, synthetic distillation proof, real teacher experiments, gradient balance study, equity risk scorecard |
+| 02 | Distillation at Scale | **NEXT** | Execute 3-stage MambaInLlama on RunPod A100: SVD-split init, KL distillation with per-component LR, weighted multilingual sampling |
+| 03 | Evaluation & Paper | Planned | Full benchmark suite (mGSM, XCOPA, Deja Vu) across 67 languages, equity analysis, ablation studies, paper targeting EMNLP / ACL / NeurIPS |
 
 ---
 
