@@ -144,11 +144,13 @@ def _extract_submatrix(
 
     # Initialize padding with small random values
     if r < target_rows:
-        nn.init.xavier_uniform_(out[r:, :].unsqueeze(0), gain=0.1)
-        out[r:, :] = out[r:, :].squeeze(0)
+        pad = out[r:, :].unsqueeze(0)
+        nn.init.xavier_uniform_(pad, gain=0.1)
+        out[r:, :] = pad.squeeze(0)
     if c < target_cols:
-        nn.init.xavier_uniform_(out[:, c:].unsqueeze(0), gain=0.1)
-        out[:, c:] = out[:, c:].squeeze(0)
+        pad = out[:, c:].unsqueeze(0)
+        nn.init.xavier_uniform_(pad, gain=0.1)
+        out[:, c:] = pad.squeeze(0)
 
     return out
 
@@ -352,6 +354,11 @@ def convert_ffn_to_moe(
             U, S, Vh = torch.linalg.svd(gate_w.float(), full_matrices=False)
             k_per_expert = min(student_d_ff, len(S) // num_experts)
 
+            # Pre-compute down_proj SVD once (was inside loop before)
+            U_d, S_d, Vh_d = torch.linalg.svd(
+                down_w.float(), full_matrices=False
+            )
+
             for i, expert in enumerate(moe_block.experts):
                 start = i * k_per_expert
                 end = start + k_per_expert
@@ -364,9 +371,6 @@ def convert_ffn_to_moe(
                 expert.w1.weight.data = w1_init
 
                 # For w2: corresponding slice of down_proj
-                U_d, S_d, Vh_d = torch.linalg.svd(
-                    down_w.float(), full_matrices=False
-                )
                 U_d_i = U_d[:student_d_model, start:end]
                 S_d_i = S_d[start:end]
                 Vh_d_i = Vh_d[start:end, :student_d_ff]
@@ -435,16 +439,9 @@ def _compute_block_cka(
 
     # Get teacher output
     teacher_block.eval()
-    if is_attn:
-        # For attention: output is the hidden state after the layer
-        # We need to run the full layer including residual
-        t_out = teacher_block(sample_input)[0] if isinstance(
-            teacher_block(sample_input), tuple
-        ) else teacher_block(sample_input)
-    else:
-        t_out = teacher_block(sample_input)
-        if isinstance(t_out, tuple):
-            t_out = t_out[0]
+    t_out = teacher_block(sample_input)
+    if isinstance(t_out, tuple):
+        t_out = t_out[0]
 
     # Get student output
     student_block.eval()

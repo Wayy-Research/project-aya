@@ -30,10 +30,15 @@ from numpy.typing import NDArray
 # ---------------------------------------------------------------------------
 
 def _center_gram(K: torch.Tensor) -> torch.Tensor:
-    """Center a Gram matrix: H @ K @ H where H = I - 1/n."""
-    n = K.shape[0]
-    unit = torch.ones(n, n, device=K.device, dtype=K.dtype) / n
-    return K - unit @ K - K @ unit + unit @ K @ unit
+    """Center a Gram matrix: H @ K @ H where H = I - 1/n.
+
+    Uses row/column means instead of full matrix multiplications
+    for O(n^2) instead of O(n^3) centering.
+    """
+    col_mean = K.mean(dim=0, keepdim=True)  # (1, n)
+    row_mean = K.mean(dim=1, keepdim=True)  # (n, 1)
+    grand_mean = K.mean()
+    return K - col_mean - row_mean + grand_mean
 
 
 def _hsic(K: torch.Tensor, L: torch.Tensor) -> torch.Tensor:

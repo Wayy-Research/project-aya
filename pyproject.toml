@@ -71,4 +71,16 @@ warn_unused_configs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --tb=short"
+addopts = "-v --tb=short -x"
+markers = [
+    "slow: marks tests that load models or take >5s",
+    "gpu: marks tests requiring GPU",
+]
+
+[tool.coverage.run]
+source = ["aya_distill"]
+omit = ["*/testing/fixtures.py"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 60
