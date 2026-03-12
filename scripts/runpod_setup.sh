@@ -74,12 +74,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
 print('Downloading tokenizer...')
-tok = AutoTokenizer.from_pretrained('CohereForAI/aya-expanse-8b', trust_remote_code=True)
+tok = AutoTokenizer.from_pretrained('CohereLabs/tiny-aya-global', trust_remote_code=True)
 print(f'Tokenizer vocab: {len(tok)}')
 
 print('Downloading teacher model...')
 model = AutoModelForCausalLM.from_pretrained(
-    'CohereForAI/aya-expanse-8b',
+    'CohereLabs/tiny-aya-global',
     torch_dtype=torch.bfloat16,
     trust_remote_code=True,
 )

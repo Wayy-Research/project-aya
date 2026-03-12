@@ -6,15 +6,15 @@
 ##   - alpha=0.7 for KL/CE balance (NB09)
 ##   - SVD split for MoE diversity (NB03)
 ##
-## Teacher: CohereForAI/aya-expanse-8b (~16GB fp16)
+## Teacher: CohereLabs/tiny-aya-global (3.35B, validated in NB01-NB11)
 ## Student: Aetheris HybridMambaMoE (~800M params)
 ## Data: ClimbMix (Stage 1-2), multilingual chat (Stage 3)
 ##
 ## Wayy Research, 2024-2026
 
-# Teacher model
+# Teacher model (tiny-aya-global: 3.35B, 70+ langs, no gated access required)
 teacher:
-  name: "CohereForAI/aya-expanse-8b"
+  name: "CohereLabs/tiny-aya-global"
   dtype: "bfloat16"
   device_map: "auto"
 
@@ -95,9 +95,9 @@ data:
     buffer_size: 500
     min_tokens: 32
 
-  # Stage 3: Multilingual chat data
+  # Stage 3: Multilingual chat data (aya_collection is non-gated)
   sft:
-    dataset_name: "CohereForAI/aya_dataset"
+    dataset_name: "CohereForAI/aya_collection"
     streaming: true
 
 # --- Evaluation ---
