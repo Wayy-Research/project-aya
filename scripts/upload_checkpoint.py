@@ -51,6 +51,12 @@ def load_checkpoint_metadata(ckpt_path: Path) -> dict:
     """Extract training metadata from a checkpoint without loading full weights."""
     ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
 
+    # Log all top-level keys for debugging
+    logger.info(f"Checkpoint keys: {list(ckpt.keys())}")
+    for k, v in ckpt.items():
+        if k != "student_state_dict" and k != "vocab_projector_state_dict":
+            logger.info(f"  {k}: {type(v).__name__} = {repr(v)[:200]}")
+
     meta = {
         "step": ckpt.get("step", "unknown"),
         "checkpoint_file": ckpt_path.name,
@@ -61,9 +67,23 @@ def load_checkpoint_metadata(ckpt_path: Path) -> dict:
     if "cka_history" in ckpt:
         cka = ckpt["cka_history"]
         if cka:
-            last = cka[-1] if isinstance(cka[-1], dict) else {}
-            meta["cka_mean"] = last.get("mean", None)
-            meta["cka_min"] = last.get("min", None)
+            if isinstance(cka, list):
+                last = cka[-1] if isinstance(cka[-1], dict) else {}
+                meta["cka_mean"] = last.get("mean", None)
+                meta["cka_min"] = last.get("min", None)
+            elif isinstance(cka, dict):
+                # Dict keyed by step or layer pair
+                meta["cka_history_keys"] = list(cka.keys())[:5]
+                # Try to get summary stats from values
+                vals = []
+                for v in cka.values():
+                    if isinstance(v, (int, float)):
+                        vals.append(v)
+                    elif isinstance(v, dict) and "mean" in v:
+                        vals.append(v["mean"])
+                if vals:
+                    meta["cka_mean"] = sum(vals) / len(vals)
+                    meta["cka_min"] = min(vals)
 
     if "loss_history" in ckpt:
         losses = ckpt["loss_history"]
@@ -283,7 +303,13 @@ def main():
 
     logger.info(f"Uploading checkpoint: {ckpt_path} (Stage {stage})")
 
-    upload_dir = prepare_upload_dir(ckpt_path, stage, args.config)
+    try:
+        upload_dir = prepare_upload_dir(ckpt_path, stage, args.config)
+    except Exception as e:
+        logger.error(f"Failed to prepare upload: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
     upload_to_hub(upload_dir, stage, args.message)
 
     logger.info("Done!")
