@@ -427,8 +427,11 @@ class KLDistillationTrainer:
             accum_loss += loss.item()
 
             if (self.step + 1) % self.config.gradient_accumulation == 0:
+                all_params = list(self.student.parameters())
+                if self.vocab_projector.needs_projection:
+                    all_params += list(self.vocab_projector.parameters())
                 torch.nn.utils.clip_grad_norm_(
-                    self.student.parameters(),
+                    all_params,
                     self.config.max_grad_norm,
                 )
                 optimizer.step()

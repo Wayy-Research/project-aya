@@ -124,7 +124,11 @@ def load_student(
         logger.info("Loading student checkpoint: %s", checkpoint_path)
         ckpt = torch.load(checkpoint_path, map_location="cpu")
         state_dict = ckpt.get("student_state_dict", ckpt)
-        model.load_state_dict(state_dict, strict=False)
+        missing, unexpected = model.load_state_dict(state_dict, strict=False)
+        if missing:
+            logger.warning("Missing keys in checkpoint: %s", missing[:10])
+        if unexpected:
+            logger.warning("Unexpected keys in checkpoint: %s", unexpected[:10])
 
     # Set dtype
     dtype_str = student_cfg.get("dtype", "bfloat16")
@@ -477,7 +481,7 @@ def main() -> None:
         logger.info("  GPU: %s", torch.cuda.get_device_name(0))
         logger.info(
             "  VRAM: %.1f GB",
-            torch.cuda.get_device_properties(0).total_mem / 1e9,
+            torch.cuda.get_device_properties(0).total_memory / 1e9,
         )
     logger.info("  Languages: %s", config.get("languages", []))
     logger.info("=" * 60)

@@ -40,7 +40,7 @@ else
 fi
 
 # 1. Install uv for fast Python package management
-echo "[1/7] Installing uv..."
+echo "[1/6] Installing uv..."
 if ! command -v uv &> /dev/null; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
     export PATH="$HOME/.local/bin:$PATH"
@@ -58,7 +58,7 @@ source .venv/bin/activate
 echo "[3/6] Installing aya-distill..."
 uv pip install -e ".[dev]"
 
-echo "[3/6] Installing aetheris..."
+echo "[3b/6] Installing aetheris..."
 cd "$WORKSPACE/aetheris"
 uv pip install -e ".[cuda,data]"
 
@@ -97,7 +97,7 @@ print(f'CUDA available: {torch.cuda.is_available()}')
 if torch.cuda.is_available():
     print(f'GPU: {torch.cuda.get_device_name(0)}')
     props = torch.cuda.get_device_properties(0)
-    print(f'VRAM: {props.total_mem / 1e9:.1f} GB')
+    print(f'VRAM: {props.total_memory / 1e9:.1f} GB')
     print(f'Compute capability: {props.major}.{props.minor}')
 "
 
