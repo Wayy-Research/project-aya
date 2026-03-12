@@ -19,10 +19,28 @@ echo "  Project Aya — RunPod Setup"
 echo "============================================"
 
 WORKSPACE="/workspace/aya"
+
+# 0. Clone repos if not already present
+echo "[0/7] Cloning repositories..."
+mkdir -p "$WORKSPACE"
 cd "$WORKSPACE"
 
+if [ ! -d "project-aya" ]; then
+    git clone -b dev https://github.com/Wayy-Research/project-aya.git
+else
+    echo "  project-aya already exists, pulling latest..."
+    cd project-aya && git pull origin dev && cd ..
+fi
+
+if [ ! -d "aetheris" ]; then
+    git clone https://github.com/Wayy-Research/aetheris.git
+else
+    echo "  aetheris already exists, pulling latest..."
+    cd aetheris && git pull origin main && cd ..
+fi
+
 # 1. Install uv for fast Python package management
-echo "[1/6] Installing uv..."
+echo "[1/7] Installing uv..."
 if ! command -v uv &> /dev/null; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
     export PATH="$HOME/.local/bin:$PATH"
