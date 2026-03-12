@@ -1,0 +1,30 @@
+## Aetheris Demo Student -- tiny model for proof-of-concept
+## ~74M params (dominated by 256k vocab embedding)
+## 8 layers: 4 SSM (even) + 4 MoE (odd)
+##
+## Designed to train on CPU within a few hours.
+## Wayy Research, 2024-2026
+
+vocab_size: 256000
+d_model: 256
+n_layer: 8
+num_experts: 2
+top_k: 1
+d_ff: 768           # d_model * 3
+
+# SSM parameters
+ssm_d_state: 8
+ssm_expand: 2
+# d_inner: null  # defaults to d_model * ssm_expand = 512
+
+# Training parameters
+load_balancing_coef: 0.01
+router_z_loss_coef: 0.001
+max_seq_len: 128
+dtype: "float32"     # CPU training -- no fp16
+
+# Optimization -- all disabled for small model
+use_cpu_offload: false
+gradient_checkpointing: false
+checkpoint_ssm_layers: false
+use_flash_attention: false

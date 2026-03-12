@@ -1,0 +1,82 @@
+## Demo Distillation Config
+## Runs all 3 stages on CPU with synthetic data from fixtures.
+## Produces a trained demo model for evaluation.
+##
+## Based on research findings from NB08-NB11:
+##   - SSM 10x LR boost (NB11)
+##   - T=2.0 for KL distillation (NB09)
+##   - alpha=0.7 for KL/CE balance (NB09)
+##   - SVD split for MoE diversity (NB03)
+##
+## Wayy Research, 2024-2026
+
+# Teacher model
+teacher:
+  name: "CohereLabs/aya-23-8B"
+  dtype: "float16"
+  device_map: "cpu"
+
+# Student model
+student:
+  config_path: "configs/demo_student.yaml"
+  dtype: "float32"
+  checkpoint: null
+
+# Languages (5 core for demo)
+languages: ["en", "es", "hi", "ar", "zh"]
+
+# Seed
+seed: 42
+
+# --- Stage 0: Block Conversion ---
+conversion:
+  strategy: "weight_map"      # No refinement for speed
+  a_init: "exponential_decay"
+  delta_init: "uniform"
+  ffn_to_moe: "svd_split"    # Best diversity (CKA=0.097)
+
+# --- Stage 1: Layer Alignment ---
+stage1:
+  enabled: true
+  total_steps: 200
+  lr: 1e-4
+  warmup_steps: 20
+  batch_size: 1
+  gradient_accumulation: 4
+  max_seq_len: 128
+  loss_type: "mse+cosine"
+  cka_threshold: 0.60        # Realistic for attn->SSM (NB07: 0.604)
+  cka_check_every: 50
+  output_dir: "checkpoints/demo/stage1_alignment"
+
+# --- Stage 2: KL Distillation ---
+stage2:
+  enabled: true
+  total_steps: 500
+  lr: 3e-4                   # Base LR
+  ssm_lr_multiplier: 10.0    # SSM blocks get 10x (NB11)
+  warmup_steps: 50
+  batch_size: 1
+  gradient_accumulation: 4
+  max_seq_len: 128
+  temperature: 2.0            # NB09: T=2.0 good balance
+  alpha: 0.7                  # NB09: alpha=0.7
+  output_dir: "checkpoints/demo/stage2_kl"
+
+# --- Stage 3: SFT ---
+stage3:
+  enabled: true
+  total_steps: 200
+  lr: 2e-5
+  warmup_steps: 20
+  batch_size: 1
+  gradient_accumulation: 4
+  max_seq_len: 128
+  output_dir: "checkpoints/demo/stage3_sft"
+
+# --- Evaluation ---
+eval:
+  max_new_tokens: 64
+  temperature: 0.7
+  top_p: 0.9
+  output_dir: "results/demo"

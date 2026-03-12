@@ -52,6 +52,7 @@ class KLDistillationConfig:
 
     # Training
     lr: float = 5e-5
+    ssm_lr_multiplier: float = 1.0  # SSM blocks get lr * this (NB11: 10x)
     warmup_steps: int = 500
     total_steps: int = 20000
     batch_size: int = 4
@@ -206,12 +207,51 @@ class KLDistillationTrainer:
         self.step = 0
 
     def _setup_optimizer(self) -> tuple[AdamW, Any]:
-        """Create optimizer and LR scheduler for student + projector."""
-        params = list(self.student.parameters())
-        if self.vocab_projector.needs_projection:
-            params += list(self.vocab_projector.parameters())
+        """Create optimizer and LR scheduler for student + projector.
 
-        optimizer = AdamW(params, lr=self.config.lr, weight_decay=0.01)
+        When ssm_lr_multiplier > 1.0, SSM layers (even-indexed) get a
+        boosted learning rate. NB11 showed this is essential: SSM blocks
+        receive ~27x less gradient than MoE, so 10x LR compensates.
+        """
+        base_lr = self.config.lr
+        ssm_mult = self.config.ssm_lr_multiplier
+
+        if ssm_mult != 1.0 and hasattr(self.student, "layers"):
+            # Per-component LR: SSM layers (even indices) get boosted
+            n_layers = len(self.student.layers)
+            ssm_indices = set(range(0, n_layers, 2))
+
+            ssm_params = []
+            other_params = []
+            for name, param in self.student.named_parameters():
+                if not param.requires_grad:
+                    continue
+                is_ssm = any(f"layers.{i}." in name for i in ssm_indices)
+                if is_ssm:
+                    ssm_params.append(param)
+                else:
+                    other_params.append(param)
+
+            if self.vocab_projector.needs_projection:
+                other_params += list(self.vocab_projector.parameters())
+
+            param_groups = [
+                {"params": ssm_params, "lr": base_lr * ssm_mult},
+                {"params": other_params, "lr": base_lr},
+            ]
+            logger.info(
+                "Per-component LR: %d SSM params (lr=%.2e), "
+                "%d other params (lr=%.2e)",
+                len(ssm_params), base_lr * ssm_mult,
+                len(other_params), base_lr,
+            )
+        else:
+            params = list(self.student.parameters())
+            if self.vocab_projector.needs_projection:
+                params += list(self.vocab_projector.parameters())
+            param_groups = [{"params": params, "lr": base_lr}]
+
+        optimizer = AdamW(param_groups, weight_decay=0.01)
 
         warmup = LinearLR(
             optimizer,

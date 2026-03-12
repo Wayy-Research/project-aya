@@ -260,6 +260,7 @@ def run_stage2(config: dict[str, Any], device: torch.device) -> None:
         temperature=kl_cfg.get("temperature", 2.0),
         alpha=kl_cfg.get("alpha", 0.7),
         lr=train_cfg.get("lr", 5e-5),
+        ssm_lr_multiplier=train_cfg.get("ssm_lr_multiplier", 1.0),
         warmup_steps=train_cfg.get("warmup_steps", 500),
         total_steps=train_cfg.get("total_steps", 20000),
         batch_size=train_cfg.get("batch_size", 4),
